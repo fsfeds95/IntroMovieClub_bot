@@ -1,45 +1,38 @@
 const { Telegraf } = require('telegraf');
 const axios = require('axios');
 
+const API_KEY = '74dc824830c7f93dc61b03e324070886';
 const BOT_TOKEN = '7799058013:AAE-HjGVOt5AbOKfdR-KGL66reWhdADPgn8';
-const TMDB_API_KEY = '74dc824830c7f93dc61b03e324070886';
 
 const bot = new Telegraf(BOT_TOKEN);
 
 bot.on('inline_query', async (ctx) => {
  const query = ctx.inlineQuery.query;
- const response = await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${query}`);
+ if (!query) return;
 
- const results = response.data.results.map((movie) => ({
-  type: 'photo',
-  id: movie.id.toString(),
-  photo_url: `https://image.tmdb.org/t/p/original${movie.backdrop_path}`,
-  thumb_url: `https://image.tmdb.org/t/p/w200${movie.backdrop_path}`,
-  caption: movie.title,
-  parse_mode: 'HTML'
+ const response = await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=es-ES&query=${query}`);
+ const movies = response.data.results;
+
+ const results = movies.map(movie => ({
+  type: 'article',
+  id: movie.id,
+  title: movie.title,
+  input_message_content: {
+   message_text: `
+        ![Backdrop](${movie.backdrop_path ? `https://image.tmdb.org/t/p/w500${movie.backdrop_path}` : ''})
+        **${movie.title} (${movie.release_date.split('-')[0]})**
+        - Título original: ${movie.original_title}
+        - Idioma original: ${movie.original_language}
+        - Duración: ${movie.runtime} min
+        - Géneros: ${movie.genre_ids.join(', ')}
+        - Sinopsis: ${movie.overview}
+      `,
+  },
+  thumb_url: movie.backdrop_path ? `https://image.tmdb.org/t/p/w500${movie.backdrop_path}` : '',
+  description: movie.title,
  }));
 
- ctx.answerInlineQuery(results);
-});
-
-bot.on('chosen_inline_result', async (ctx) => {
- const movieId = ctx.chosenInlineResult.result_id;
- const response = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${TMDB_API_KEY}`);
-
- const movie = response.data;
- const genres = movie.genres.map(genre => genre.name).join(', ');
-
- const message = `
-🎬 <b>${movie.title} (${movie.release_date.slice(0, 4)})</b>
-🌟 <b>${movie.original_title}</b>
-🗣️ Idioma original: <b>${movie.original_language}</b>
-⏱️ Duración: <b>${movie.runtime} min</b>
-🎭 Géneros: <b>${genres}</b>
-📝 Sinopsis: ${movie.overview}
-🔗 Más información: https://www.themoviedb.org/movie/${movie.id}
-    `;
-
- ctx.replyWithPhoto(`https://image.tmdb.org/t/p/original${movie.backdrop_path}`, { caption: message, parse_mode: 'HTML' });
+ await ctx.answerInlineQuery(results);
 });
 
 bot.launch();
