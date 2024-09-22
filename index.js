@@ -1,6 +1,5 @@
 const { Telegraf } = require('telegraf');
 
-const API_KEY = '74dc824830c7f93dc61b03e324070886';
 const BOT_TOKEN = '7799058013:AAE-HjGVOt5AbOKfdR-KGL66reWhdADPgn8';
 
 const { Telegraf } = require('telegraf');
