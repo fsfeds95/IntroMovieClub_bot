@@ -1,4 +1,4 @@
-const BOT_TOKEN = '7799058013:AAE-HjGVOt5AbOKfdR-KGL66reWhdADPgn8';
+const BOT_TOKEN = '7299943772:AAFMZ8yI9RVwpG9GNXQBpZsMJTRW0S05kCM';
 
 const { Telegraf } = require('telegraf');
 
