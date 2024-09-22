@@ -1,10 +1,10 @@
 {
- "name": "movie-search-bot",
+ "name": "telegram-movie-bot",
  "version": "1.0.0",
- "description": "Bot de Telegram para buscar películas usando la API de TheMovieDB",
- "main": "bot.js",
+ "description": "A Telegram bot to search movies using TheMovieDB API",
+ "main": "index.js",
  "dependencies": {
-  "axios": "^0.24.0",
-  "telegraf": "^4.4.0"
+  "telegraf": "^4.16.3",
+  "axios": "^1.7.7"
  }
 }
