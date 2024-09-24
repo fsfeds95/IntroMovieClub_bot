@@ -1,6 +1,6 @@
 // Importar las bibliotecas requeridas
 const express = require('express');
-const jimp = require('jimp-compact');
+const Jimp = require('Jimp-compact');
 
 // Crea una aplicación en Express
 const app = express();
@@ -20,6 +20,22 @@ bot.start((ctx) => {
  ctx.reply(`¡Hola ${firstName}, este es tu usuario ${username}!`);
 });
 
+bot.on('text', (ctx) => {
+ ctx.reply('' + ctx.message.text);
+});
+
+bot.on('sticker', (ctx) => {
+ ctx.reply('Formato no válido');
+});
+
+bot.on('voice', (ctx) => {
+ ctx.reply('Formato no válido');
+});
+
+bot.on('audio', (ctx) => {
+ ctx.reply('Formato no válido');
+});
+
 bot.command('backdrop', async (ctx) => {
  const repliedMessage = ctx.message.reply_to_message;
 
@@ -31,11 +47,11 @@ bot.command('backdrop', async (ctx) => {
    const image = await Jimp.read(imageUrl);
 
    // Redimensionar la imagen usando RESIZE_MAGPHASE
-   image.resize(1280, 720, jimp.RESIZE_MAGPHASE);
+   image.resize(1280, 720, Jimp.RESIZE_MAGPHASE);
 
    // Cargar las marcas de agua
-   const watermark1 = await jimp.read('Wtxt-Backdrop.png');
-   const watermark2 = await jimp.read('Wlogo-Backdrop.png');
+   const watermark1 = await Jimp.read('./img/b/Wtxt-Backdrop.png');
+   const watermark2 = await Jimp.read('./img/b/Wlogo-Backdrop.png');
 
    // Escala la marca de agua a 1280px de ancho por 720px de alto
    watermark1.resize(1280, 720);
@@ -47,14 +63,14 @@ bot.command('backdrop', async (ctx) => {
 
    // Combinar las marcas de agua en una sola imagen
    watermark1.composite(watermark2, 0, 0, {
-    mode: jimp.BLEND_SOURCE_OVER,
+    mode: Jimp.BLEND_SOURCE_OVER,
     opacitySource: 1.0,
     opacityDest: 1.0
    });
 
    // Aplicar la marca de agua a la imagen
    image.composite(watermark1, 0, 0, {
-    mode: jimp.BLEND_SOURCE_OVER,
+    mode: Jimp.BLEND_SOURCE_OVER,
     opacitySource: 1.0,
     opacityDest: 1.0
    });
@@ -72,22 +88,6 @@ bot.command('backdrop', async (ctx) => {
  } else {
   ctx.reply('Por favor, responde a una imagen para agregarle una marca de agua utilizando el comando /backdrop.');
  }
-});
-
-bot.on('text', (ctx) => {
- ctx.reply('' + ctx.message.text);
-});
-
-bot.on('sticker', (ctx) => {
- ctx.reply('Formato no válido');
-});
-
-bot.on('voice', (ctx) => {
- ctx.reply('Formato no válido');
-});
-
-bot.on('audio', (ctx) => {
- ctx.reply('Formato no válido');
 });
 
 bot.launch();
