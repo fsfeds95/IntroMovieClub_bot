@@ -93,6 +93,7 @@ bot.on('photo', (ctx) => {
   const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
   console.log(fileUrl);
   ctx.reply(fileUrl);
+  ctx.replyWithPhoto(photoId);
  });
 });
 
