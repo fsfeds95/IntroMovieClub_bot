@@ -22,14 +22,17 @@ bot.start((ctx) => {
 });
 
 bot.command('backdrop', async (ctx) => {
- const repliedMessage = ctx.message.reply_to_message;
+ // Envía el mensaje de espera
+ const waitMessage = await ctx.reply('Espere un momento...');
 
- if (repliedMessage && repliedMessage.photo) {
-  const photo = repliedMessage.photo[repliedMessage.photo.length - 1]; // Obtiene la última foto respondida
+ if (ctx.message.reply_to_message && ctx.message.reply_to_message.photo) {
+  const photoId = ctx.message.reply_to_message.photo[3].file_id;
 
   try {
-   const imageUrl = await ctx.telegram.getFileLink(photo.file_id);
-   const image = await jimp.read(imageUrl);
+   const file = await ctx.telegram.getFile(photoId);
+   const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
+
+   const image = await jimp.read(fileUrl);
 
    // Redimensionar la imagen usando RESIZE_MAGPHASE
    image.resize(1280, 720, jimp.RESIZE_MAGPHASE);
@@ -60,12 +63,16 @@ bot.command('backdrop', async (ctx) => {
     opacityDest: 1.0
    });
 
-   // Guardar la imagen en formato WEBP con calidad al 100%
+   // Guardar la imagen con la calidad al 100%
    image.quality(100).scale(1);
 
    const buffer = await image.getBufferAsync(jimp.MIME_JPEG);
 
+   // Responde con la imagen original y la marca de agua
    ctx.replyWithPhoto({ source: buffer });
+
+   // Elimina el mensaje de espera
+   await ctx.deleteMessage(waitMessage.message_id);
   } catch (error) {
    console.log(error);
    ctx.reply('Hubo un error al agregar la marca de agua a la imagen.');
@@ -77,6 +84,9 @@ bot.command('backdrop', async (ctx) => {
 
 // Responde cuando alguien usa el comando /marca
 bot.command('marca', async (ctx) => {
+ // Envía el mensaje de espera
+ const waitMessage = await ctx.reply('Espere un momento...');
+
  if (ctx.message.reply_to_message && ctx.message.reply_to_message.photo) {
   const photoId = ctx.message.reply_to_message.photo[3].file_id;
 
@@ -96,18 +106,15 @@ bot.command('marca', async (ctx) => {
    // 10 píxeles de margen
    const y = image.bitmap.height - textHeight - 10;
 
-   // Envía el mensaje de espera
-   const waitMessage = await ctx.reply('Espere un momento...');
-
    // Aplica la marca de agua
    image.print(font, x, y, text);
    const buffer = await image.getBufferAsync(jimp.MIME_JPEG);
 
-   // Elimina el mensaje de espera
-   await ctx.deleteMessage(waitMessage.message_id);
-
    // Responde con la imagen original y la marca de agua
    ctx.replyWithPhoto({ source: buffer });
+
+   // Elimina el mensaje de espera
+   await ctx.deleteMessage(waitMessage.message_id);
   } catch (error) {
    console.log(error);
    ctx.reply('Hubo un error al agregar la marca de agua a la imagen.');
