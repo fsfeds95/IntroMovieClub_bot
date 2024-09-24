@@ -77,9 +77,15 @@ bot.command('backdrop', async (ctx) => {
   } catch (error) {
    console.log(error);
    ctx.reply('Hubo un error al agregar la marca de agua a la imagen.');
+
+   // Elimina el mensaje de espera
+   await ctx.deleteMessage(waitMessage.message_id);
   }
  } else {
-  ctx.reply('Por favor, responde a una imagen para agregarle una marca de agua utilizando el comando /backdrop.');
+  ctx.reply('Por favor, responde a una imagen con /backdrop para agregarle una marca de agua a la imagen.');
+
+   // Elimina el mensaje de espera
+   await ctx.deleteMessage(waitMessage.message_id);
  }
 });
 
@@ -119,9 +125,15 @@ bot.command('marca', async (ctx) => {
   } catch (error) {
    console.log(error);
    ctx.reply('Hubo un error al agregar la marca de agua a la imagen.');
+
+   // Elimina el mensaje de espera
+   await ctx.deleteMessage(waitMessage.message_id);
   }
  } else {
   ctx.reply("¡Responde a una imagen con el comando /marca!");
+
+   // Elimina el mensaje de espera
+   await ctx.deleteMessage(waitMessage.message_id);
  }
 });
 
