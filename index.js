@@ -10,7 +10,7 @@ const port = 8225;
 // Importar la biblioteca telegraf
 const { Telegraf } = require('telegraf');
 // el API TIKEN del bot
-const BOT_TOKEN = '7299943772:AAFt74BpvkqcGQ3nq2H7fr8C1AVHVF_byk4';
+const BOT_TOKEN = '7299943772:AAGd7Aakc1Ho4_3QPpz9ZNCx7QiS5IEzw-g';
 const bot = new Telegraf(BOT_TOKEN);
 
 
