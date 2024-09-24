@@ -1,6 +1,6 @@
 // Importar las bibliotecas requeridas
 const express = require('express');
-const Jimp = require('jimp');
+const { Jimp } = require('jimp');
 
 // Crea una aplicación en Express
 const app = express();
@@ -28,14 +28,14 @@ bot.command('backdrop', async (ctx) => {
 
   try {
    const imageUrl = await ctx.telegram.getFileLink(photo.file_id);
-   const image = await jimp.read(imageUrl);
+   const image = await Jimp.read(imageUrl);
 
    // Redimensionar la imagen usando RESIZE_MAGPHASE
-   image.resize(1280, 720, jimp.RESIZE_MAGPHASE);
+   image.resize(1280, 720, Jimp.RESIZE_MAGPHASE);
 
    // Cargar las marcas de agua
-   const watermark1 = await jimp.read('./img/b/Wtxt-Backdrop.png');
-   const watermark2 = await jimp.read('./img/b/Wlogo-Backdrop.png');
+   const watermark1 = await Jimp.read('./img/b/Wtxt-Backdrop.png');
+   const watermark2 = await Jimp.read('./img/b/Wlogo-Backdrop.png');
 
    // Escala la marca de agua a 1280px de ancho por 720px de alto
    watermark1.resize(1280, 720);
@@ -47,14 +47,14 @@ bot.command('backdrop', async (ctx) => {
 
    // Combinar las marcas de agua en una sola imagen
    watermark1.composite(watermark2, 0, 0, {
-    mode: jimp.BLEND_SOURCE_OVER,
+    mode: Jimp.BLEND_SOURCE_OVER,
     opacitySource: 1.0,
     opacityDest: 1.0
    });
 
    // Aplicar la marca de agua a la imagen
    image.composite(watermark1, 0, 0, {
-    mode: jimp.BLEND_SOURCE_OVER,
+    mode: Jimp.BLEND_SOURCE_OVER,
     opacitySource: 1.0,
     opacityDest: 1.0
    });
@@ -62,7 +62,7 @@ bot.command('backdrop', async (ctx) => {
    // Guardar la imagen en formato WEBP con calidad al 100%
    image.quality(100).scale(1);
 
-   const buffer = await image.getBufferAsync(jimp.MIME_JPEG);
+   const buffer = await image.getBufferAsync(Jimp.MIME_JPEG);
 
    ctx.replyWithPhoto({ source: buffer });
   } catch (error) {
