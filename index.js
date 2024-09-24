@@ -8,6 +8,8 @@ const { Telegraf } = require('telegraf');
 // Importar las bibliotecas requeridas
 const jimp = require('jimp-compact');
 const fs = require('fs');
+// Cargar las citas desde el archivo JSON
+let dbCitas = JSON.parse(fs.readFileSync('citas.json'));
 
 // el API TOKEN del bot
 const BOT_TOKEN = '7299943772:AAGd7Aakc1Ho4_3QPpz9ZNCx7QiS5IEzw-g';
