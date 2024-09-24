@@ -81,8 +81,10 @@ bot.command('marca', async (ctx) => {
   const photoId = ctx.message.reply_to_message.photo[0].file_id;
 
   try {
-   const file = await ctx.telegram.getFile(photoId);
-   const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
+   //const file = await ctx.telegram.getFile(photoId);
+   const fileUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/getFile?file_id=${photoId}`;
+   
+   //const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
 
    const image = await jimp.read(fileUrl);
    const font = await jimp.loadFont(jimp.FONT_SANS_32_BLACK);
@@ -132,7 +134,7 @@ bot.on('audio', (ctx) => {
 bot.on('photo', (ctx) => {
  const photoId = ctx.message.photo[0].file_id;
  ctx.telegram.getFile(photoId).then(file => {
-  const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
+  const fileUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/getFile?file_id=${photoId}`;
   // Envia la url a la consola
   console.log(fileUrl);
   // Envía la url al chat
