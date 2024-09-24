@@ -1,11 +1,11 @@
 // Importar las bibliotecas requeridas
 const express = require('express');
+
 // Crea una aplicación en Express
 const app = express();
 const port = 8225;
 
 
-// Importar la biblioteca de Telegraf
 const { Telegraf } = require('telegraf');
 
 const BOT_TOKEN = '7299943772:AAGtB60BK_9GY43LcotfNNSRy0qxB1CzPZQ';
@@ -53,8 +53,8 @@ app.listen(port, () => {
  setInterval(() => {
   fetch(`http://localhost:${port}/keep-alive`)
    .then(response => {
-    const currentDate = new Date();
-    const formattedTime = `${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()} - ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
+    const currentDate = new Date().toLocaleString("es-VE", { timeZone: "America/Caracas" });
+    const formattedTime = currentDate;
     console.log(`Sigo vivo 🎉 (${formattedTime})`);
    })
    .catch(error => {
