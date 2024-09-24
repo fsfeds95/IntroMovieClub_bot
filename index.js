@@ -77,13 +77,16 @@ bot.command('backdrop', async (ctx) => {
 
 // Responde cuando alguien usa el comando /marca
 bot.command('marca', async (ctx) => {
+ // Verifica si hay un mensaje y si es una foto
  if (ctx.message.reply_to_message && ctx.message.reply_to_message.photo) {
   const photoId = ctx.message.reply_to_message.photo[0].file_id;
 
   try {
+   // Obtiene el archivo de la foto
    const file = await ctx.telegram.getFile(photoId);
    const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
 
+   // Carga la imagen y la fuente
    const image = await jimp.read(fileUrl);
    const font = await jimp.loadFont(jimp.FONT_SANS_32_BLACK);
 
@@ -91,14 +94,29 @@ bot.command('marca', async (ctx) => {
    const text = 'bot';
    const textWidth = jimp.measureText(font, text);
    const textHeight = jimp.measureTextHeight(font, text, image.bitmap.width);
+
    // 10 píxeles de margen
    const x = image.bitmap.width - textWidth - 10;
    // 10 píxeles de margen
    const y = image.bitmap.height - textHeight - 10;
 
-   // Aplica la marca de agua sin cambiar la calidad
-   image.print(font, x, y, text);
+   // Envía el mensaje de espera
+   const waitMessage = await ctx.reply('Espere un momento...');
+
+   // Aplica la marca de agua con color blanco y opacidad del 12%
+   const rgbaColor = jimp.cssColorToHex('#FFFFFF'); // Color blanco
+   image.print(font, x, y, text, textWidth, textHeight, {
+    color: rgbaColor,
+    opacity: 0.12 // 12% de opacidad
+   });
+
+   // Guardar la imagen en calidad al 100%
+   image.quality(100).scale(1);
+
    const buffer = await image.getBufferAsync(jimp.MIME_JPEG);
+
+   // Elimina el mensaje de espera
+   await ctx.deleteMessage(waitMessage.message_id);
 
    // Responde con la imagen original y la marca de agua
    ctx.replyWithPhoto({ source: buffer });
@@ -107,6 +125,7 @@ bot.command('marca', async (ctx) => {
    ctx.reply('Hubo un error al agregar la marca de agua a la imagen.');
   }
  } else {
+  // Informa al usuario si no se responde a una imagen
   ctx.reply("¡Responde a una imagen con el comando /marca!");
  }
 });
