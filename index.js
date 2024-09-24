@@ -6,11 +6,11 @@ const app = express();
 const port = 8225;
 
 
-const BOT_TOKEN = '7299943772:AAGtB60BK_9GY43LcotfNNSRy0qxB1CzPZQ';
-
 const { Telegraf } = require('telegraf');
 
+const BOT_TOKEN = '7299943772:AAGtB60BK_9GY43LcotfNNSRy0qxB1CzPZQ';
 const bot = new Telegraf(BOT_TOKEN);
+
 
 bot.start((ctx) => {
  const username = ctx.from.username ? `@${ctx.from.username}` : '';
@@ -21,6 +21,15 @@ bot.start((ctx) => {
 
 bot.on('text', (ctx) => {
  ctx.reply('' + ctx.message.text);
+});
+bot.on('sticker', (ctx) => {
+ ctx.reply('Formato no válido');
+});
+bot.on('voice', (ctx) => {
+ ctx.reply('Formato no válido');
+});
+bot.on('audio', (ctx) => {
+ ctx.reply('Formato no válido');
 });
 
 bot.launch();
