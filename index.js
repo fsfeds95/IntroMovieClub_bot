@@ -78,7 +78,7 @@ bot.command('backdrop', async (ctx) => {
 // Responde cuando alguien usa el comando /marca
 bot.command('marca', async (ctx) => {
  if (ctx.message.reply_to_message && ctx.message.reply_to_message.photo) {
-  const photoId = ctx.message.reply_to_message.photo[2].file_id;
+  const photoId = ctx.message.reply_to_message.photo[3].file_id;
 
   try {
    const file = await ctx.telegram.getFile(photoId);
@@ -130,9 +130,9 @@ bot.on('audio', (ctx) => {
 });
 
 bot.on('photo', (ctx) => {
- const photoId = ctx.message.photo[0].file_id;
+ const photoId = ctx.message.photo[3].file_id;
  ctx.telegram.getFile(photoId).then(file => {
-  const fileUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/getFile?file_id=${photoId}`;
+  const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
   // Envia la url a la consola
   console.log(fileUrl);
   // Envía la url al chat
