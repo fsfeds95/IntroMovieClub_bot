@@ -1,29 +1,49 @@
 // Importar las bibliotecas requeridas
 const express = require('express');
-const jimp = require('jimp-compact');
-
 // Crea una aplicación en Express
 const app = express();
 const port = 8225;
-
-
 // Importar la biblioteca telegraf
 const { Telegraf } = require('telegraf');
-// el API TIKEN del bot
+// Importar las bibliotecas requeridas
+const jimp = require('jimp-compact');
+const fs = require('fs');
+
+// el API TOKEN del bot
 const BOT_TOKEN = '7299943772:AAGd7Aakc1Ho4_3QPpz9ZNCx7QiS5IEzw-g';
 const bot = new Telegraf(BOT_TOKEN);
 
+const userIds = []; // Array para almacenar los IDs de los usuarios
+const ADMIN_ID = '6839704393'; // Reemplaza esto con el ID del administrador
 
+// Respuesta de Bienvenida al comando /start
 bot.start((ctx) => {
+ const userId = ctx.from.id;
+ if (!userIds.includes(userId)) {
+  userIds.push(userId); // Agregar el ID si no está ya en el array
+ }
+
  const username = ctx.from.username ? `@${ctx.from.username}` : '';
  const firstName = ctx.from.first_name ? ctx.from.first_name : '';
 
  ctx.reply(`¡Hola ${firstName}, este es tu usuario ${username}!`);
 });
 
+// Comando para el administrador
+bot.command('todos', (ctx) => {
+ if (ctx.from.id === ADMIN_ID) { // Verificar si es el administrador
+  const message = ctx.message.text.split(' ').slice(1).join(' ');
+  userIds.forEach(userId => {
+   ctx.telegram.sendMessage(userId, message);
+  });
+  ctx.reply('¡Mensaje enviado a todos los usuarios!');
+ } else {
+  ctx.reply('¡No tienes permiso para usar este comando! 😏');
+ }
+});
+
 // Responde cuando alguien usa el comando /backdrop
 bot.command('backdrop', async (ctx) => {
- // Envía el mensaje de espera
  const waitMessage = await ctx.reply('Espere un momento...');
 
  if (ctx.message.reply_to_message && ctx.message.reply_to_message.photo) {
@@ -84,14 +104,13 @@ bot.command('backdrop', async (ctx) => {
  } else {
   ctx.reply('Por favor, responde a una imagen con /backdrop para agregarle una marca de agua a la imagen.');
 
-   // Elimina el mensaje de espera
-   await ctx.deleteMessage(waitMessage.message_id);
+  // Elimina el mensaje de espera
+  await ctx.deleteMessage(waitMessage.message_id);
  }
 });
 
 // Responde cuando alguien usa el comando /marca
 bot.command('marca', async (ctx) => {
- // Envía el mensaje de espera
  const waitMessage = await ctx.reply('Espere un momento...');
 
  if (ctx.message.reply_to_message && ctx.message.reply_to_message.photo) {
@@ -132,27 +151,55 @@ bot.command('marca', async (ctx) => {
  } else {
   ctx.reply("¡Responde a una imagen con el comando /marca!");
 
-   // Elimina el mensaje de espera
-   await ctx.deleteMessage(waitMessage.message_id);
+  // Elimina el mensaje de espera
+  await ctx.deleteMessage(waitMessage.message_id);
  }
 });
 
+// Comando para obtener una cita aleatoria
+bot.command('cita', (ctx) => {
+ const citaAleatoria = dbCitas.dbCitas[Math.floor(Math.random() * dbCitas.dbCitas.length)];
+ ctx.reply(`${citaAleatoria.texto} - ${citaAleatoria.pelicula} (${citaAleatoria.genero})`);
+});
+
+// Comando para agregar una cita
+bot.command('addcita', (ctx) => {
+ const textoCita = ctx.message.text.split(' ').slice(1).join(' ');
+ const [texto, pelicula, genero] = textoCita.split('|'); // Usa '|' como separador
+
+ if (texto && pelicula && genero) {
+  // Agregar la nueva cita al array
+  dbCitas.dbCitas.push({ texto, pelicula, genero });
+
+  // Guardar el archivo JSON actualizado
+  fs.writeFileSync('citas.json', JSON.stringify(dbCitas, null, 2));
+
+  ctx.reply('¡Cita agregada con éxito!');
+ } else {
+  ctx.reply('Por favor, usa el formato:\n\n/addcita "texto|pelicula|genero"');
+ }
+});
+
+// Ve los stickers
 bot.on('sticker', (ctx) => {
  ctx.reply('Formato no válido');
 });
 
+// Ve los voice
 bot.on('voice', (ctx) => {
  ctx.reply('Formato no válido');
 });
 
+// Ve los audios
 bot.on('audio', (ctx) => {
  ctx.reply('Formato no válido');
 });
 
+// Ve los fotos
 bot.on('photo', (ctx) => {
  const firstName = ctx.from.first_name ? ctx.from.first_name : '';
-  // Envía la url al chat
-  ctx.reply(`¡Imagen recibida! gracias por enviala ${firstName}\n\nPuedes usar:\n\n/backdrop para hacer una marca de agua.`);
+ // Envía la url al chat
+ ctx.reply(`¡Imagen recibida! gracias por enviala ${firstName}\n\nPuedes usar:\n\n/backdrop para hacer una marca de agua.`);
 });
 
 // Responde cuando alguien responde a la imagen
@@ -162,7 +209,7 @@ bot.on('reply_to_message', (ctx) => {
  }
 });
 
-
+// Repite todo lo que le escribas
 bot.on('text', (ctx) => {
  ctx.reply('' + ctx.message.text);
 });
