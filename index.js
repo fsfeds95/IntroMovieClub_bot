@@ -77,16 +77,13 @@ bot.command('backdrop', async (ctx) => {
 
 // Responde cuando alguien usa el comando /marca
 bot.command('marca', async (ctx) => {
- // Verifica si hay un mensaje y si es una foto
  if (ctx.message.reply_to_message && ctx.message.reply_to_message.photo) {
   const photoId = ctx.message.reply_to_message.photo[0].file_id;
 
   try {
-   // Obtiene el archivo de la foto
    const file = await ctx.telegram.getFile(photoId);
    const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
 
-   // Carga la imagen y la fuente
    const image = await jimp.read(fileUrl);
    const font = await jimp.loadFont(jimp.FONT_SANS_32_BLACK);
 
@@ -94,7 +91,6 @@ bot.command('marca', async (ctx) => {
    const text = 'bot';
    const textWidth = jimp.measureText(font, text);
    const textHeight = jimp.measureTextHeight(font, text, image.bitmap.width);
-
    // 10 píxeles de margen
    const x = image.bitmap.width - textWidth - 10;
    // 10 píxeles de margen
@@ -103,14 +99,8 @@ bot.command('marca', async (ctx) => {
    // Envía el mensaje de espera
    const waitMessage = await ctx.reply('Espere un momento...');
 
-   // Aplica la marca de agua con color blanco y opacidad del 12%
-   const rgbaColor = jimp.cssColorToHex('rgba(255, 255, 255, 0.12)'); // Color blanco
-   
-   image.print(font, x, y, text, textWidth, textHeight, rgbaColor);
-
-   // Guardar la imagen en calidad al 100%
-   image.quality(100).scale(1);
-
+   // Aplica la marca de agua
+   image.print(font, x, y, text);
    const buffer = await image.getBufferAsync(jimp.MIME_JPEG);
 
    // Elimina el mensaje de espera
@@ -123,7 +113,6 @@ bot.command('marca', async (ctx) => {
    ctx.reply('Hubo un error al agregar la marca de agua a la imagen.');
   }
  } else {
-  // Informa al usuario si no se responde a una imagen
   ctx.reply("¡Responde a una imagen con el comando /marca!");
  }
 });
