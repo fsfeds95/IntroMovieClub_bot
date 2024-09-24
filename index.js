@@ -91,10 +91,20 @@ bot.on('photo', (ctx) => {
  const photoId = ctx.message.photo[0].file_id;
  ctx.telegram.getFile(photoId).then(file => {
   const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
+  // Envia la url a la consola
   console.log(fileUrl);
+  // Envía la url al chat
   ctx.reply(fileUrl);
-  ctx.replyWithPhoto(photoId);
+  // Envía la imagen en su resolución original al chat
+  ctx.replyWithPhoto(photoId, { caption: "¡Mira esta imagen!" });
  });
+});
+
+// Responde cuando alguien responde a la imagen
+bot.on('reply_to_message', (ctx) => {
+ if (ctx.message.reply_to_message.photo) {
+  ctx.reply("¡Gracias por tu respuesta! ¿Qué te parece la imagen?");
+ }
 });
 
 
