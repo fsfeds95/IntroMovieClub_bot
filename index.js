@@ -75,6 +75,29 @@ bot.command('backdrop', async (ctx) => {
  }
 });
 
+// Responde cuando alguien usa el comando /marca
+bot.command('marca', (ctx) => {
+ if (ctx.message.reply_to_message && ctx.message.reply_to_message.photo) {
+  const photoId = ctx.message.reply_to_message.photo[0].file_id;
+
+  ctx.telegram.getFile(photoId).then(file => {
+   const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
+
+   Jimp.read(fileUrl).then(image => {
+    Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(font => {
+     // Ajusta el texto y posición
+     image.print(font, 10, 10, 'bot', 300);
+     image.getBuffer(Jimp.MIME_JPEG, (err, buffer) => {
+      ctx.replyWithPhoto({ source: buffer });
+     });
+    });
+   });
+  });
+ } else {
+  ctx.reply("¡Responde a una imagen con el comando /marca!");
+ }
+});
+
 bot.on('sticker', (ctx) => {
  ctx.reply('Formato no válido');
 });
