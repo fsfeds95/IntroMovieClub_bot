@@ -78,13 +78,11 @@ bot.command('backdrop', async (ctx) => {
 // Responde cuando alguien usa el comando /marca
 bot.command('marca', async (ctx) => {
  if (ctx.message.reply_to_message && ctx.message.reply_to_message.photo) {
-  const photoId = ctx.message.reply_to_message.photo[0].file_id;
+  const photoId = ctx.message.reply_to_message.photo[4].file_id;
 
   try {
-   //const file = await ctx.telegram.getFile(photoId);
-   const fileUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/getFile?file_id=${photoId}`;
-   
-   //const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
+   const file = await ctx.telegram.getFile(photoId);
+   const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
 
    const image = await jimp.read(fileUrl);
    const font = await jimp.loadFont(jimp.FONT_SANS_32_BLACK);
