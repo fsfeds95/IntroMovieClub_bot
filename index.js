@@ -1,6 +1,6 @@
 // Importar las bibliotecas requeridas
 const express = require('express');
-const { Jimp } = require('jimp');
+const { Jimp } = require('jimp-compact');
 
 // Crea una aplicación en Express
 const app = express();
