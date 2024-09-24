@@ -1,6 +1,6 @@
 // Importar las bibliotecas requeridas
 const express = require('express');
-const { Jimp } = require('jimp');
+const Jimp = require('jimp-compact');
 
 // Crea una aplicación en Express
 const app = express();
@@ -9,7 +9,7 @@ const port = 8225;
 
 const { Telegraf } = require('telegraf');
 
-const BOT_TOKEN = '7299943772:AAFt74BpvkqcGQ3nq2H7fr8C1AVHVF_byk4';
+const BOT_TOKEN = '7299943772:AAGtB60BK_9GY43LcotfNNSRy0qxB1CzPZQ';
 const bot = new Telegraf(BOT_TOKEN);
 
 
