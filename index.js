@@ -1,6 +1,6 @@
 // Importar las bibliotecas requeridas
 const express = require('express');
-const { Jimp } = require('jimp-compact');
+const { Jimp } = require('jimp');
 
 // Crea una aplicación en Express
 const app = express();
@@ -87,6 +87,16 @@ bot.on('audio', (ctx) => {
  ctx.reply('Formato no válido');
 });
 
+bot.on('photo', (ctx) => {
+ const photoId = ctx.message.photo[0].file_id;
+ ctx.telegram.getFile(photoId).then(file => {
+  const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
+  console.log(fileUrl);
+  ctx.reply(fileUrl);
+ });
+});
+
+
 bot.on('text', (ctx) => {
  ctx.reply('' + ctx.message.text);
 });
@@ -109,8 +119,8 @@ app.listen(port, () => {
  setInterval(() => {
   fetch(`http://localhost:${port}/keep-alive`)
    .then(response => {
-    const currentDate = new Date();
-    const formattedTime = `${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()} - ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
+    const currentDate = new Date().toLocaleString("es-VE", { timeZone: "America/Caracas" });
+    const formattedTime = currentDate;
     console.log(`Sigo vivo 🎉 (${formattedTime})`);
    })
    .catch(error => {
