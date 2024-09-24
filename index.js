@@ -76,23 +76,36 @@ bot.command('backdrop', async (ctx) => {
 });
 
 // Responde cuando alguien usa el comando /marca
-bot.command('marca', (ctx) => {
+bot.command('marca', async (ctx) => {
  if (ctx.message.reply_to_message && ctx.message.reply_to_message.photo) {
   const photoId = ctx.message.reply_to_message.photo[0].file_id;
 
-  ctx.telegram.getFile(photoId).then(file => {
+  try {
+   const file = await ctx.telegram.getFile(photoId);
    const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
 
-   jimp.read(fileUrl).then(image => {
-    jimp.loadFont(jimp.FONT_SANS_32_BLACK).then(font => {
-     // Ajusta el texto y posición
-     image.print(font, 10, 10, 'bot', 300);
-     image.getBuffer(jimp.MIME_JPEG, (err, buffer) => {
-      ctx.replyWithPhoto({ source: buffer });
-     });
-    });
-   });
-  });
+   const image = await jimp.read(fileUrl);
+   const font = await jimp.loadFont(jimp.FONT_SANS_32_BLACK);
+
+   // Calcula la posición para la esquina inferior derecha
+   const text = 'bot';
+   const textWidth = jimp.measureText(font, text);
+   const textHeight = jimp.measureTextHeight(font, text, image.bitmap.width);
+   // 10 píxeles de margen
+   const x = image.bitmap.width - textWidth - 10;
+   // 10 píxeles de margen
+   const y = image.bitmap.height - textHeight - 10;
+
+   // Aplica la marca de agua sin cambiar la calidad
+   image.print(font, x, y, text);
+   const buffer = await image.getBufferAsync(jimp.MIME_JPEG);
+
+   // Responde con la imagen original y la marca de agua
+   ctx.replyWithPhoto({ source: buffer });
+  } catch (error) {
+   console.log(error);
+   ctx.reply('Hubo un error al agregar la marca de agua a la imagen.');
+  }
  } else {
   ctx.reply("¡Responde a una imagen con el comando /marca!");
  }
