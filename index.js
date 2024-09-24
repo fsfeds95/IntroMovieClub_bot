@@ -78,7 +78,7 @@ bot.command('backdrop', async (ctx) => {
 // Responde cuando alguien usa el comando /marca
 bot.command('marca', async (ctx) => {
  if (ctx.message.reply_to_message && ctx.message.reply_to_message.photo) {
-  const photoId = ctx.message.reply_to_message.photo[4].file_id;
+  const photoId = ctx.message.reply_to_message.photo[1].file_id;
 
   try {
    const file = await ctx.telegram.getFile(photoId);
