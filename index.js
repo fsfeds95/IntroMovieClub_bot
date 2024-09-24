@@ -104,11 +104,9 @@ bot.command('marca', async (ctx) => {
    const waitMessage = await ctx.reply('Espere un momento...');
 
    // Aplica la marca de agua con color blanco y opacidad del 12%
-   const rgbaColor = jimp.cssColorToHex('#FFFFFF'); // Color blanco
-   image.print(font, x, y, text, textWidth, textHeight, {
-    color: rgbaColor,
-    opacity: 0.12 // 12% de opacidad
-   });
+   const rgbaColor = jimp.cssColorToHex('rgba(255, 255, 255, 0.12)'); // Color blanco
+   
+   image.print(font, x, y, text, textWidth, textHeight, rgbaColor);
 
    // Guardar la imagen en calidad al 100%
    image.quality(100).scale(1);
