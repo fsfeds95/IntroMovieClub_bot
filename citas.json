@@ -1,0 +1,19 @@
+{
+  "citas": [
+    {
+      "texto": "Hasta la vista, baby",
+      "pelicula": "Terminator 2",
+      "genero": "Acción"
+    },
+    {
+      "texto": "No, soy tu padre",
+      "pelicula": "Star Wars: Episode V",
+      "genero": "Ciencia Ficción"
+    },
+    {
+      "texto": "Te amo, hasta el infinito y más allá",
+      "pelicula": "Toy Story",
+      "genero": "Animación"
+    }
+  ]
+}
