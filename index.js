@@ -20,22 +20,6 @@ bot.start((ctx) => {
  ctx.reply(`¡Hola ${firstName}, este es tu usuario ${username}!`);
 });
 
-bot.on('text', (ctx) => {
- ctx.reply('' + ctx.message.text);
-});
-
-bot.on('sticker', (ctx) => {
- ctx.reply('Formato no válido');
-});
-
-bot.on('voice', (ctx) => {
- ctx.reply('Formato no válido');
-});
-
-bot.on('audio', (ctx) => {
- ctx.reply('Formato no válido');
-});
-
 bot.command('backdrop', async (ctx) => {
  const repliedMessage = ctx.message.reply_to_message;
 
@@ -88,6 +72,22 @@ bot.command('backdrop', async (ctx) => {
  } else {
   ctx.reply('Por favor, responde a una imagen para agregarle una marca de agua utilizando el comando /backdrop.');
  }
+});
+
+bot.on('sticker', (ctx) => {
+ ctx.reply('Formato no válido');
+});
+
+bot.on('voice', (ctx) => {
+ ctx.reply('Formato no válido');
+});
+
+bot.on('audio', (ctx) => {
+ ctx.reply('Formato no válido');
+});
+
+bot.on('text', (ctx) => {
+ ctx.reply('' + ctx.message.text);
 });
 
 bot.launch();
