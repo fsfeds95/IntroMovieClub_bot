@@ -1,13 +1,14 @@
 {
  "name": "mi-bot-telegram",
- "version": "1.0.0",
+ "version": "0",
  "description": "Bot básico de Telegram en Node.js",
  "main": "index.js",
  "scripts": {
   "start": "node index.js"
  },
-  "dependencies": {
-    "telegraf": "^4.4.2",
-    "axios": "^0.21.1"
-  }
+ "dependencies": {
+  "express": "^4.17.1",
+  "telegraf": "^4.4.0",
+  "axios": "^0.21.1"
+ }
 }
