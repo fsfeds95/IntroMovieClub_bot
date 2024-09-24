@@ -21,6 +21,7 @@ bot.start((ctx) => {
  ctx.reply(`¡Hola ${firstName}, este es tu usuario ${username}!`);
 });
 
+// Responde cuando alguien usa el comando /backdrop
 bot.command('backdrop', async (ctx) => {
  // Envía el mensaje de espera
  const waitMessage = await ctx.reply('Espere un momento...');
@@ -69,7 +70,7 @@ bot.command('backdrop', async (ctx) => {
    const buffer = await image.getBufferAsync(jimp.MIME_JPEG);
 
    // Responde con la imagen original y la marca de agua
-   ctx.replyWithPhoto({ source: buffer });
+   ctx.replyWithPhoto({ source: buffer }, { caption: "¡Tu imagen con marca de agua!" });
 
    // Elimina el mensaje de espera
    await ctx.deleteMessage(waitMessage.message_id);
@@ -111,7 +112,7 @@ bot.command('marca', async (ctx) => {
    const buffer = await image.getBufferAsync(jimp.MIME_JPEG);
 
    // Responde con la imagen original y la marca de agua
-   ctx.replyWithPhoto({ source: buffer });
+   ctx.replyWithPhoto({ source: buffer }, { caption: "¡Tu imagen con marca de agua!" });
 
    // Elimina el mensaje de espera
    await ctx.deleteMessage(waitMessage.message_id);
@@ -137,16 +138,9 @@ bot.on('audio', (ctx) => {
 });
 
 bot.on('photo', (ctx) => {
- const photoId = ctx.message.photo[3].file_id;
- ctx.telegram.getFile(photoId).then(file => {
-  const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
-  // Envia la url a la consola
-  console.log(fileUrl);
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
   // Envía la url al chat
-  ctx.reply(fileUrl);
-  // Envía la imagen en su resolución original al chat
-  ctx.replyWithPhoto(photoId, { caption: "¡Mira esta imagen!" });
- });
+  ctx.reply(`¡Imagen recibida! gracias por enviala ${firstName}\n\nPuedes usar:\n\n/backdrop para hacer una marca de agua.`);
 });
 
 // Responde cuando alguien responde a la imagen
