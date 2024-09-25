@@ -7,16 +7,13 @@ const port = 8225;
 const { Telegraf } = require('telegraf');
 // Importar las bibliotecas requeridas
 const jimp = require('jimp-compact');
-const fs = require('fs');
-// Cargar las citas desde el archivo JSON
-const dbCitas = JSON.parse(fs.readFileSync('citas.json'));
 
 // el API TOKEN del bot
 const BOT_TOKEN = '7299943772:AAGd7Aakc1Ho4_3QPpz9ZNCx7QiS5IEzw-g';
 const bot = new Telegraf(BOT_TOKEN);
 
 const userIds = []; // Array para almacenar los IDs de los usuarios
-const ADMIN_ID = '6839704393'; // Reemplaza esto con el ID del administrador
+const ADMIN_ID = '-6839704393'; // Reemplaza esto con el ID del administrador
 
 // Respuesta de Bienvenida al comando /start
 bot.start((ctx) => {
@@ -155,30 +152,6 @@ bot.command('marca', async (ctx) => {
 
   // Elimina el mensaje de espera
   await ctx.deleteMessage(waitMessage.message_id);
- }
-});
-
-// Comando para obtener una cita aleatoria
-bot.command('cita', (ctx) => {
- const citaAleatoria = dbCitas.dbCitas[Math.floor(Math.random() * dbCitas.dbCitas.length)];
- ctx.reply(`${citaAleatoria.texto} - ${citaAleatoria.pelicula} (${citaAleatoria.genero})`);
-});
-
-// Comando para agregar una cita
-bot.command('addcita', (ctx) => {
- const textoCita = ctx.message.text.split(' ').slice(1).join(' ');
- const [texto, pelicula, genero] = textoCita.split('|'); // Usa '|' como separador
-
- if (texto && pelicula && genero) {
-  // Agregar la nueva cita al array
-  dbCitas.dbCitas.push({ texto, pelicula, genero });
-
-  // Guardar el archivo JSON actualizado
-  fs.writeFileSync('citas.json', JSON.stringify(dbCitas, null, 2));
-
-  ctx.reply('¡Cita agregada con éxito!');
- } else {
-  ctx.reply('Por favor, usa el formato:\n\n/addcita "texto|pelicula|genero"');
  }
 });
 
