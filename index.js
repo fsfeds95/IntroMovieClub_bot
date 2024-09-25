@@ -9,7 +9,7 @@ const { Telegraf } = require('telegraf');
 const jimp = require('jimp-compact');
 
 // el API TOKEN del bot
-const BOT_TOKEN = '7299943772:AAGd7Aakc1Ho4_3QPpz9ZNCx7QiS5IEzw-g';
+const BOT_TOKEN = '7299943772:AAGdi4-o8Qjn5QcpM3qtvrhlJsUVrx9iqR8';
 const bot = new Telegraf(BOT_TOKEN);
 
 const userIds = []; // Array para almacenar los IDs de los usuarios
@@ -191,7 +191,7 @@ bot.on('text', (ctx) => {
  const firstName = ctx.from.first_name ? ctx.from.first_name : '';
  
  
- console.log(`"Nombre: ${firstName}, Usuario: ${username}, Dijo :` + ctx.message.text) + `"`;
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, Dijo : ` + ctx.message.text) + ` "`;
  
  ctx.reply('' + ctx.message.text);
 });
