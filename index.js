@@ -191,7 +191,7 @@ bot.on('text', (ctx) => {
  const firstName = ctx.from.first_name ? ctx.from.first_name : '';
  
  
- console.log(`Nombre: ${firstName}\n\nUsuario: ${username}\n\nDijo :` + ctx.message.text);
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, Dijo :` + ctx.message.text) + `"`;
  
  ctx.reply('' + ctx.message.text);
 });
