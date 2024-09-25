@@ -186,6 +186,13 @@ bot.on('reply_to_message', (ctx) => {
 
 // Repite todo lo que le escribas
 bot.on('text', (ctx) => {
+
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ 
+ 
+ console.log(`Nombre: ${firstName}\n\nUsuario: ${username}\n\nDijo :` + ctx.message.text);
+ 
  ctx.reply('' + ctx.message.text);
 });
 
