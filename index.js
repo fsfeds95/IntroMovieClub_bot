@@ -9,7 +9,7 @@ const { Telegraf } = require('telegraf');
 const jimp = require('jimp-compact');
 
 // el API TOKEN del bot
-const BOT_TOKEN = '7299943772:AAEpcwT3s80SGmvfqgK4Rr3cwTrrVDuFJQc';
+const BOT_TOKEN = '7299943772:AAF-6_WRDzpyHk4xCL199sZbVDI3VVuaIp4';
 const bot = new Telegraf(BOT_TOKEN);
 
 const userIds = []; // Array para almacenar los IDs de los usuarios
@@ -221,5 +221,5 @@ app.listen(port, () => {
    .catch(error => {
     console.error('Error en la solicitud de keep-alive:', error);
    });
- }, 0 * 30 * 0000); // 0 minutos * 30 segundos * 0000 milisegundos
+ }, 5 * 60 * 1000); // 30 minutos * 60 segundos * 1000 milisegundos
 });
