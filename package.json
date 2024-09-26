@@ -1,7 +1,7 @@
 {
- "name": "mi-bot-telegram",
- "version": "0",
- "description": "Bot básico de Telegram en Node.js",
+ "name": "telegrambot-themoviedb",
+ "version": "V2 - final",
+ "description": "Telegram bot to search movies from TheMovieDB API",
  "main": "index.js",
  "scripts": {
   "start": "node index.js"
@@ -9,6 +9,8 @@
  "dependencies": {
   "express": "^4.17.1",
   "telegraf": "^4.4.0",
+  "request": "^2.88.2",
   "jimp-compact": "^0.16.1-2"
- }
+ },
+ "license": "MIT"
 }
