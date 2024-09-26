@@ -13,7 +13,7 @@ const BOT_TOKEN = '7299943772:AAFZddwFU6Abj4fWDR_IKhairWMP8LD0Yx8';
 const bot = new Telegraf(BOT_TOKEN);
 
 const userIds = []; // Array para almacenar los IDs de los usuarios
-const ADMIN_ID = '-6839704393'; // Reemplaza esto con el ID del administrador
+const ADMIN_ID = '6839704393'; // Reemplaza esto con el ID del administrador
 
 //=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=\\
 //                        COMANDOS                       \\
