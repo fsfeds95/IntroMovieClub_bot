@@ -9,27 +9,39 @@ const { Telegraf } = require('telegraf');
 const jimp = require('jimp-compact');
 
 // el API TOKEN del bot
-const BOT_TOKEN = '7299943772:AAF-6_WRDzpyHk4xCL199sZbVDI3VVuaIp4';
+const BOT_TOKEN = '7299943772:AAFZddwFU6Abj4fWDR_IKhairWMP8LD0Yx8';
 const bot = new Telegraf(BOT_TOKEN);
 
 const userIds = []; // Array para almacenar los IDs de los usuarios
 const ADMIN_ID = '-6839704393'; // Reemplaza esto con el ID del administrador
 
+//=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=\\
+//                        COMANDOS                       \\
+
 // Respuesta de Bienvenida al comando /start
 bot.start((ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
  const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} uso : /start"`);
+
  if (!userIds.includes(userId)) {
   userIds.push(userId); // Agregar el ID si no está ya en el array
  }
 
- const username = ctx.from.username ? `@${ctx.from.username}` : '';
- const firstName = ctx.from.first_name ? ctx.from.first_name : '';
-
  ctx.reply(`¡Hola ${firstName}, este es tu usuario ${username}!`);
 });
 
+
 // Comando para el administrador
 bot.command('todos', (ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} uso : /todos"`);
+
  if (ctx.from.id === ADMIN_ID) { // Verificar si es el administrador
   const message = ctx.message.text.split(' ').slice(1).join(' ');
   userIds.forEach(userId => {
@@ -43,7 +55,13 @@ bot.command('todos', (ctx) => {
 
 // Responde cuando alguien usa el comando /backdrop
 bot.command('backdrop', async (ctx) => {
- const waitMessage = await ctx.reply('Espere un momento...');
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} uso : /backdrop"`);
+
+ const waitMessage = await ctx.reply(`Espere un momento ${firstName}...`);
 
  if (ctx.message.reply_to_message && ctx.message.reply_to_message.photo) {
   const photoId = ctx.message.reply_to_message.photo[3].file_id;
@@ -110,6 +128,12 @@ bot.command('backdrop', async (ctx) => {
 
 // Responde cuando alguien usa el comando /marca
 bot.command('marca', async (ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} uso : /marca"`);
+
  const waitMessage = await ctx.reply('Espere un momento...');
 
  if (ctx.message.reply_to_message && ctx.message.reply_to_message.photo) {
@@ -155,46 +179,112 @@ bot.command('marca', async (ctx) => {
  }
 });
 
-// Ve los stickers
-bot.on('sticker', (ctx) => {
- ctx.reply('Formato no válido');
-});
+//=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=\\
+//                        EVENTOS                        \\
 
 // Ve los voice
 bot.on('voice', (ctx) => {
- ctx.reply('Formato no válido');
-});
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
 
-// Ve los audios
-bot.on('audio', (ctx) => {
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio un voice"`);
+
  ctx.reply('Formato no válido');
 });
 
 // Ve los fotos
 bot.on('photo', (ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
  const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio una foto"`);
+
  // Envía la url al chat
- ctx.reply(`¡Imagen recibida! gracias por enviala ${firstName}\n\nPuedes usar:\n\n/backdrop para hacer una marca de agua.`);
+ ctx.reply(`¡Imagen recibida! gracias por enviala ${firstName}\nPuedes usar:\n/backdrop para hacer una marca de agua.`);
+});
+
+// Ve los videos
+bot.on('video', (ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio un video"`);
+
+ ctx.reply('¡Has enviado un video!');
+});
+
+// Ve los documentos
+bot.on('document', (ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio un documento"`);
+
+ ctx.reply('¡Has enviado un documento!');
+});
+
+// Ve los audios
+bot.on('audio', (ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio un audio"`);
+
+ ctx.reply('¡Has enviado un audio!');
+});
+
+// Para otros tipos de archivos
+bot.on('message', (ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio un tipo de archivo no valido"`);
+
+ ctx.reply('¡Ups! Parece que has enviado un formato de archivo no válido. Por favor, intenta enviar una imagen, video, documento o audio en su lugar. ¡Gracias!');
 });
 
 // Responde cuando alguien responde a la imagen
 bot.on('reply_to_message', (ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} respondio a una imagen"`);
+
  if (ctx.message.reply_to_message.photo) {
   ctx.reply("¡Gracias por tu respuesta! ¿Qué te parece la imagen?");
  }
 });
 
-// Repite todo lo que le escribas
-bot.on('text', (ctx) => {
-
+// Ve los stickers
+bot.on('sticker', (ctx) => {
  const username = ctx.from.username ? `@${ctx.from.username}` : '';
  const firstName = ctx.from.first_name ? ctx.from.first_name : '';
- 
- 
- console.log(`"Nombre: ${firstName}, Usuario: ${username}, Dijo : ` + ctx.message.text) + ` "`;
- 
+ const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio un stickers"`);
+
+ ctx.reply('Formato no válido');
+});
+
+// Repite todoo lo que le escribas
+bot.on('text', (ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio un texto"`);
+
  ctx.reply('' + ctx.message.text);
 });
+
+//=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=\\
 
 bot.launch();
 
@@ -208,11 +298,11 @@ app.get('/keep-alive', (req, res) => {
 
 // Iniciar el servidor en el puerto 8225
 app.listen(port, () => {
- console.log(`Servidor iniciado en http://localhost:${port}`);
+ console.log(`Servidor iniciado en ${req.hostname}:${port}`);
 
  // Código del cliente para mantener la conexión activa
  setInterval(() => {
-  fetch(`http://localhost:${port}/keep-alive`)
+  fetch(`${req.hostname}:${port}/keep-alive`)
    .then(response => {
     const currentDate = new Date().toLocaleString("es-VE", { timeZone: "America/Caracas" });
     const formattedTime = currentDate;
@@ -221,6 +311,5 @@ app.listen(port, () => {
    .catch(error => {
     console.error('Error en la solicitud de keep-alive:', error);
    });
- }, 10 * 60 * 1000);
-// 10 minutos * 60 segundos * 1000 milisegundos
+ }, 5 * 60 * 1000); // 30 minutos * 60 segundos * 1000 milisegundos
 });
