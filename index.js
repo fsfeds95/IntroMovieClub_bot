@@ -10,7 +10,7 @@ const { Telegraf } = require('telegraf');
 const jimp = require('jimp-compact');
 const request = require('request');
 
-const BOT_TOKEN = '7224464210:AAFDVRgN1KEfkPkpVtjGbXEtS3oU96YpUu0';
+const BOT_TOKEN = '7224464210:AAGNkp79OC1edo_zm7K7Tzzq9298saktTNQ';
 
 // BASE
 const BASE_URL = 'https://api.themoviedb.org/3';
@@ -29,6 +29,7 @@ const LANG_EN = 'language=en-US';
 
 const bot = new Telegraf(BOT_TOKEN);
 
+// Array para almacenar los IDs de los usuarios
 const userIds = [];
 
 
@@ -40,6 +41,7 @@ bot.start((ctx) => {
  const username = ctx.from.username ? `@${ctx.from.username}` : '';
  const firstName = ctx.from.first_name ? ctx.from.first_name : '';
  const userId = ctx.from.id;
+ const botUser = await bot.telegram.getMe().then(botInfo => `@${botInfo.username}`);
 
  console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} uso : /start"`);
 
@@ -48,11 +50,11 @@ bot.start((ctx) => {
   userIds.push(userId);
  }
 
- ctx.reply(`¡Hola ${firstName} bienvenido, este es tu usuario ${username}!`);
+ ctx.reply(`¡Hola ${firstName} bienvenid@!\n\nCOMANDOS:\n/start - Para iniciar el bot.\nUsando mi usuario ${botUser}, puedes buscar peliculas en modo inline.\n/movieId - Para uasar: Envvia /movieId + el titulo de una película.\n/imgB - Para uasar: Envvia /imgB + id de una película, y recibiras imagenes Backdrops.\n/imgP - Para uasar: Envvia /imgP + id de una película, y recibiras imagenes posters.\n/marcaB - Para uasar: Responde a una imagen horizontal.\n/marcaP - Para uasar: Responde a una imagen vertical.`);
 });
 
 // Responde cuando alguien usa el comando /backdrop
-bot.command('backdrop', async (ctx) => {
+bot.command('marcaB', async (ctx) => {
  const username = ctx.from.username ? `@${ctx.from.username}` : '';
  const firstName = ctx.from.first_name ? ctx.from.first_name : '';
  const userId = ctx.from.id;
@@ -122,6 +124,203 @@ bot.command('backdrop', async (ctx) => {
   // Elimina el mensaje de espera
   await ctx.deleteMessage(waitMessage.message_id);
  }
+});
+
+// Responde cuando alguien usa el comando /Poster
+bot.command('marcaP', async (ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} uso : /backdrop"`);
+
+ const waitMessage = await ctx.reply(`Espere un momento ${firstName}...`);
+
+ if (ctx.message.reply_to_message && ctx.message.reply_to_message.photo) {
+  const photoId = ctx.message.reply_to_message.photo[3].file_id;
+
+  try {
+   const file = await ctx.telegram.getFile(photoId);
+   const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
+
+   const image = await jimp.read(fileUrl);
+
+   // Redimensionar la imagen usando RESIZE_MAGPHASE
+   image.resize(720, 1080, jimp.RESIZE_MAGPHASE);
+
+   // Cargar las marcas de agua
+   const watermark1 = await jimp.read('Wtxt-poster.png');
+   const watermark2 = await jimp.read('Wlogo-poster.png');
+
+   // Escala la marca de agua a 1280px de ancho por 720px de alto
+   watermark1.resize(720, 1080);
+   watermark2.resize(720, 1080);
+
+   // Establece la opacidad de la watermark1 a 0.375 y watermark2 a 0.75
+   watermark1.opacity(0.08);
+   watermark2.opacity(0.40);
+
+   // Combinar las marcas de agua en una sola imagen
+   watermark1.composite(watermark2, 0, 0, {
+    mode: jimp.BLEND_SOURCE_OVER,
+    opacitySource: 1.0,
+    opacityDest: 1.0
+   });
+
+   // Aplicar la marca de agua a la imagen
+   image.composite(watermark1, 0, 0, {
+    mode: jimp.BLEND_SOURCE_OVER,
+    opacitySource: 1.0,
+    opacityDest: 1.0
+   });
+
+   // Guardar la imagen con la calidad al 100%
+   image.quality(100).scale(1);
+
+   const buffer = await image.getBufferAsync(jimp.MIME_JPEG);
+
+   // Responde con la imagen original y la marca de agua
+   ctx.replyWithPhoto({ source: buffer }, { caption: "¡Tu imagen con marca de agua!" });
+
+   // Elimina el mensaje de espera
+   await ctx.deleteMessage(waitMessage.message_id);
+  } catch (error) {
+   console.log(error);
+   ctx.reply('Hubo un error al agregar la marca de agua a la imagen.');
+
+   // Elimina el mensaje de espera
+   await ctx.deleteMessage(waitMessage.message_id);
+  }
+ } else {
+  ctx.reply('Por favor, responde a una imagen con /backdrop para agregarle una marca de agua a la imagen.');
+
+  // Elimina el mensaje de espera
+  await ctx.deleteMessage(waitMessage.message_id);
+ }
+});
+
+// Comando para buscar backdrops
+bot.command('imgB', (ctx) => {
+ const idMovie = ctx.message.text.split(' ')[1]; // Obtiene el ID de la película del mensaje
+ const url = `${BASE_URL}/movie/${idMovie}/images?${API_KEY}`;
+
+ request(url, (error, response, body) => {
+  if (error) {
+   console.log('Ay, mi amor, algo salió mal:', error);
+   ctx.reply('Ocurrió un error al buscar los backdrops. Intenta de nuevo más tarde.');
+   return;
+  }
+
+  const backdrops = JSON.parse(body).backdrops;
+
+  if (backdrops.length === 0) {
+   ctx.reply('Lo siento, no se encontraron backdrops para esta película.');
+   return;
+  }
+
+  // Filtrar backdrops por idioma
+  const filteredBackdrops = backdrops.filter(backdrop => {
+   return backdrop.iso_639_1 === 'es' || backdrop.iso_639_1 === 'en' || backdrop.iso_639_1 === null;
+  });
+
+  // Agrupar backdrops por idioma
+  const groupedBackdrops = filteredBackdrops.reduce((acc, backdrop) => {
+   const lang = backdrop.iso_639_1 || 'null'; // Usa 'null' si no hay idioma
+   if (!acc[lang]) acc[lang] = [];
+   if (acc[lang].length < 2) acc[lang].push(backdrop);
+   return acc;
+  }, {});
+
+  // Enviar solo dos backdrops por idioma
+  for (const lang in groupedBackdrops) {
+   groupedBackdrops[lang].forEach(backdrop => {
+    const backdropUrl = IMG_ORI + backdrop.file_path; // Genera la URL de cada backdrop
+    ctx.replyWithPhoto(backdropUrl); // Envía la imagen
+   });
+  }
+
+  if (Object.keys(groupedBackdrops).length === 0) {
+   ctx.reply('No se encontraron backdrops en los idiomas deseados.');
+  }
+ });
+});
+
+// Comando para buscar posters
+bot.command('imgP', (ctx) => {
+ const idMovie = ctx.message.text.split(' ')[1]; // Obtiene el ID de la película del mensaje
+ const url = `${BASE_URL}/movie/${idMovie}/images?${API_KEY}`;
+
+ request(url, (error, response, body) => {
+  if (error) {
+   console.log('Ay, mi amor, algo salió mal:', error);
+   ctx.reply('Ocurrió un error al buscar los posters. Intenta de nuevo más tarde.');
+   return;
+  }
+
+  const posters = JSON.parse(body).posters;
+
+  if (posters.length === 0) {
+   ctx.reply('Lo siento, no se encontraron posters para esta película.');
+   return;
+  }
+
+  // Filtrar posters por idioma
+  const filteredPosters = posters.filter(poster=> {
+   return backdrop.iso_639_1 === 'es' || backdrop.iso_639_1 === 'en' || backdrop.iso_639_1 === null;
+  });
+
+  // Agrupar posters por idioma
+  const groupedPosters = filteredPosters.reduce((acc, backdrop) => {
+   const lang = backdrop.iso_639_1 || 'null'; // Usa 'null' si no hay idioma
+   if (!acc[lang]) acc[lang] = [];
+   if (acc[lang].length < 2) acc[lang].push(backdrop);
+   return acc;
+  }, {});
+
+  // Enviar solo dos posters por idioma
+  for (const lang in groupedPosters) {
+   groupedPosters[lang].forEach(poster=> {
+    const backdropUrl = IMG_ORI + backdrop.file_path; // Genera la URL de cada backdrop
+    ctx.replyWithPhoto(backdropUrl); // Envía la imagen
+   });
+  }
+
+  if (Object.keys(groupedPosters).length === 0) {
+   ctx.reply('No se encontraron posters en los idiomas deseados.');
+  }
+ });
+});
+
+// Comando para buscar información de las películas por título
+bot.command('movieId', (ctx) => {
+ const query = ctx.message.text.split(' ')[1]; // Obtiene el título de la película del mensaje
+ const url = `${BASE_URL}/search/movie?${API_KEY}&${LANG_ES}&query=${encodeURIComponent(query)}`;
+
+ request(url, (error, response, body) => {
+  if (error) {
+   console.log('Ay, mi amor, algo salió mal:', error);
+   ctx.reply('Ocurrió un error al buscar las películas. Intenta de nuevo más tarde.');
+   return;
+  }
+
+  const data = JSON.parse(body);
+
+  if (!data.results || data.results.length === 0) {
+   ctx.reply('Lo siento, no se encontraron películas con ese título.');
+   return;
+  }
+
+  let message = 'Resultados encontrados:\n▬▬▬▬▬▬▬▬▬\n';
+  data.results.forEach(movie => {
+   const movieId = movie.id;
+   const title = movie.title;
+   const releaseDate = movie.release_date.split("-")[0];
+   
+   message += `Título: ${title} (${releaseDate})\nID: ${movieId}\n\n▬▬▬▬▬▬▬▬▬\n\n`;
+  });
+
+  ctx.reply(message);
+ });
 });
 
 // Iniciamos la búsqueda inline
