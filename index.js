@@ -10,7 +10,7 @@ const { Telegraf } = require('telegraf');
 const jimp = require('jimp-compact');
 const request = require('request');
 
-const BOT_TOKEN = '7224464210:AAGNkp79OC1edo_zm7K7Tzzq9298saktTNQ';
+const BOT_TOKEN = '7224464210:AAHpAtKMeV-XZxOA_xwXXNYlOI2WekQfiqU';
 
 // BASE
 const BASE_URL = 'https://api.themoviedb.org/3';
@@ -49,7 +49,7 @@ bot.start((ctx) => {
   userIds.push(userId);
  }
 
- ctx.reply(`¡Hola ${firstName} bienvenid@!\n\nCOMANDOS:\n/start - Para iniciar el bot.\nUsando mi usuario @introCinemaClub_bot, puedes buscar peliculas en modo inline.\n/movieId - Para uasar: Envvia /movieId + el titulo de una película.\n/imgB - Para uasar: Envvia /imgB + id de una película, y recibiras imagenes Backdrops.\n/imgP - Para uasar: Envvia /imgP + id de una película, y recibiras imagenes posters.\n/marcaB - Para uasar: Responde a una imagen horizontal.\n/marcaP - Para uasar: Responde a una imagen vertical.`);
+ ctx.reply(`¡Hola ${firstName} bienvenid@!\n\nCOMANDOS:\n\n/start - Para iniciar el bot.\n\nUsando mi usuario @introCinemaClub_bot, puedes buscar peliculas en modo inline.\n\n/movieId - Para uasar: Envvia /movieId + el titulo de una película.\n\n/imgB - Para uasar: Envvia /imgB + id de una película, y recibiras imagenes Backdrops.\n\n/imgP - Para uasar: Envvia /imgP + id de una película, y recibiras imagenes posters.\n\n/marcaB - Para uasar: Responde a una imagen horizontal.\n\n/marcaP - Para uasar: Responde a una imagen vertical.`);
 });
 
 // Responde cuando alguien usa el comando /backdrop
