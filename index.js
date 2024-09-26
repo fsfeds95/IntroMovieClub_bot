@@ -9,11 +9,13 @@ const { Telegraf } = require('telegraf');
 const jimp = require('jimp-compact');
 
 // el API TOKEN del bot
-const BOT_TOKEN = '7299943772:AAFZddwFU6Abj4fWDR_IKhairWMP8LD0Yx8';
+const BOT_TOKEN = '7299943772:AAFxjPMsL27ORMkCaOGF_H4aSyE5SosEIFE';
 const bot = new Telegraf(BOT_TOKEN);
 
-const userIds = []; // Array para almacenar los IDs de los usuarios
-const ADMIN_ID = '6839704393'; // Reemplaza esto con el ID del administrador
+// Array para almacenar los IDs de los usuarios
+const userIds = [];
+
+
 
 //=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=\\
 //                        COMANDOS                       \\
@@ -27,7 +29,8 @@ bot.start((ctx) => {
  console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} uso : /start"`);
 
  if (!userIds.includes(userId)) {
-  userIds.push(userId); // Agregar el ID si no está ya en el array
+  // Agregar el ID si no está ya en el array
+  userIds.push(userId);
  }
 
  ctx.reply(`¡Hola ${firstName}, este es tu usuario ${username}!`);
@@ -36,13 +39,16 @@ bot.start((ctx) => {
 
 // Comando para el administrador
 bot.command('todos', (ctx) => {
+ // Reemplaza esto con el ID del administrador
+ const ADMIN_ID = '6839704393';
  const username = ctx.from.username ? `@${ctx.from.username}` : '';
  const firstName = ctx.from.first_name ? ctx.from.first_name : '';
  const userId = ctx.from.id;
 
  console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} uso : /todos"`);
 
- if (ctx.from.id === ADMIN_ID) { // Verificar si es el administrador
+ // Verificar si es el administrador
+ if (ctx.from.id === ADMIN_ID) {
   const message = ctx.message.text.split(' ').slice(1).join(' ');
   userIds.forEach(userId => {
    ctx.telegram.sendMessage(userId, message);
@@ -292,7 +298,7 @@ bot.launch();
 
 // Ruta "/keep-alive"
 app.get('/keep-alive', (req, res) => {
- // Aquí puedes hacer algo simple, como enviar una respuesta vacía
+ // Enviar una respuesta vacía
  res.send('');
 });
 
@@ -311,5 +317,6 @@ app.listen(port, () => {
    .catch(error => {
     console.error('Error en la solicitud de keep-alive:', error);
    });
- }, 5 * 60 * 1000); // 30 minutos * 60 segundos * 1000 milisegundos
+ }, 5 * 60 * 1000);
+ // 30 minutos * 60 segundos * 1000 milisegundos
 });
