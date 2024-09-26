@@ -29,6 +29,8 @@ const LANG_EN = 'language=en-US';
 
 const bot = new Telegraf(BOT_TOKEN);
 
+const userIds = [];
+
 
 //=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=\\
 //                        COMANDOS                       \\
