@@ -298,11 +298,11 @@ app.get('/keep-alive', (req, res) => {
 
 // Iniciar el servidor en el puerto 8225
 app.listen(port, () => {
- console.log(`Servidor iniciado en ${req.hostname}:${port}`);
+ console.log(`Servidor iniciado en http://localhost:${port}`);
 
  // Código del cliente para mantener la conexión activa
  setInterval(() => {
-  fetch(`${req.hostname}:${port}/keep-alive`)
+  fetch(`http://localhost:${port}/keep-alive`)
    .then(response => {
     const currentDate = new Date().toLocaleString("es-VE", { timeZone: "America/Caracas" });
     const formattedTime = currentDate;
