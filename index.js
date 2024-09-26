@@ -33,8 +33,8 @@ const bot = new Telegraf(BOT_TOKEN);
 const userIds = [];
 
 
- //=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=\\
-//                         COMANDOS                        \\
+//=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=\\
+//                        COMANDOS                       \\
 
 // Respuesta de Bienvenida al comando /start
 bot.start((ctx) => {
@@ -53,7 +53,7 @@ bot.start((ctx) => {
 });
 
 // Responde cuando alguien usa el comando /backdrop
-bot.command('marcaB', async (ctx) => {
+bot.command('marcab', async (ctx) => {
  const username = ctx.from.username ? `@${ctx.from.username}` : '';
  const firstName = ctx.from.first_name ? ctx.from.first_name : '';
  const userId = ctx.from.id;
@@ -126,7 +126,7 @@ bot.command('marcaB', async (ctx) => {
 });
 
 // Responde cuando alguien usa el comando /Poster
-bot.command('marcaP', async (ctx) => {
+bot.command('marcap', async (ctx) => {
  const username = ctx.from.username ? `@${ctx.from.username}` : '';
  const firstName = ctx.from.first_name ? ctx.from.first_name : '';
  const userId = ctx.from.id;
@@ -199,7 +199,7 @@ bot.command('marcaP', async (ctx) => {
 });
 
 // Comando para buscar backdrops
-bot.command('imgB', (ctx) => {
+bot.command('imgb', (ctx) => {
  const idMovie = ctx.message.text.split(' ')[1]; // Obtiene el ID de la película del mensaje
  const url = `${BASE_URL}/movie/${idMovie}/images?${API_KEY}`;
 
@@ -245,7 +245,7 @@ bot.command('imgB', (ctx) => {
 });
 
 // Comando para buscar posters
-bot.command('imgP', (ctx) => {
+bot.command('imgp', (ctx) => {
  const idMovie = ctx.message.text.split(' ')[1]; // Obtiene el ID de la película del mensaje
  const url = `${BASE_URL}/movie/${idMovie}/images?${API_KEY}`;
 
@@ -291,7 +291,7 @@ bot.command('imgP', (ctx) => {
 });
 
 // Comando para buscar información de las películas por título
-bot.command('movieId', (ctx) => {
+bot.command('movieid', (ctx) => {
  const query = ctx.message.text.split(' ')[1]; // Obtiene el título de la película del mensaje
  const url = `${BASE_URL}/search/movie?${API_KEY}&${LANG_ES}&query=${encodeURIComponent(query)}`;
 
