@@ -41,7 +41,6 @@ bot.start((ctx) => {
  const username = ctx.from.username ? `@${ctx.from.username}` : '';
  const firstName = ctx.from.first_name ? ctx.from.first_name : '';
  const userId = ctx.from.id;
- const botUser = await bot.telegram.getMe().then(botInfo => `@${botInfo.username}`);
 
  console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} uso : /start"`);
 
@@ -50,7 +49,7 @@ bot.start((ctx) => {
   userIds.push(userId);
  }
 
- ctx.reply(`¡Hola ${firstName} bienvenid@!\n\nCOMANDOS:\n/start - Para iniciar el bot.\nUsando mi usuario ${botUser}, puedes buscar peliculas en modo inline.\n/movieId - Para uasar: Envvia /movieId + el titulo de una película.\n/imgB - Para uasar: Envvia /imgB + id de una película, y recibiras imagenes Backdrops.\n/imgP - Para uasar: Envvia /imgP + id de una película, y recibiras imagenes posters.\n/marcaB - Para uasar: Responde a una imagen horizontal.\n/marcaP - Para uasar: Responde a una imagen vertical.`);
+ ctx.reply(`¡Hola ${firstName} bienvenid@!\n\nCOMANDOS:\n/start - Para iniciar el bot.\nUsando mi usuario @introCinemaClub_bot, puedes buscar peliculas en modo inline.\n/movieId - Para uasar: Envvia /movieId + el titulo de una película.\n/imgB - Para uasar: Envvia /imgB + id de una película, y recibiras imagenes Backdrops.\n/imgP - Para uasar: Envvia /imgP + id de una película, y recibiras imagenes posters.\n/marcaB - Para uasar: Responde a una imagen horizontal.\n/marcaP - Para uasar: Responde a una imagen vertical.`);
 });
 
 // Responde cuando alguien usa el comando /backdrop
