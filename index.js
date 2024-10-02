@@ -10,7 +10,7 @@ const { Telegraf } = require('telegraf');
 const jimp = require('jimp-compact');
 const request = require('request');
 
-const BOT_TOKEN = '7224464210:AAEWGsvusSn62QoVcEZFLh9DCSuW-fbo8Fs';
+const BOT_TOKEN = '7224464210:AAGCXsiW0rClTiXVKmrGYzNjPV_IYs13nR0';
 
 // BASE
 const BASE_URL = 'https://api.themoviedb.org/3';
@@ -565,8 +565,8 @@ bot.launch();
 
 //=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=\\
 
-// Ruta "/tamosVivos"
-app.get('/tamosVivos', (req, res) => {
+// Ruta "/ping"
+app.get('/ping', (req, res) => {
  // Enviar una respuesta vacía
  res.send('');
 });
@@ -577,14 +577,14 @@ app.listen(port, () => {
 
  // Código del cliente para mantener la conexión activa
  setInterval(() => {
-  fetch(`http://localhost:${port}/tamosVivos`)
+  fetch(`http://localhost:${port}/ping`)
    .then(response => {
     const currentDate = new Date().toLocaleString("es-VE", { timeZone: "America/Caracas" });
     const formattedTime = currentDate;
     console.log(`Sigo vivo 🎉 (${formattedTime})`);
    })
    .catch(error => {
-    console.error('Error en la solicitud de tamosVivos:', error);
+    console.error('Error en la solicitud de ping:', error);
    });
  }, 5 * 60 * 1000);
  // 30 minutos * 60 segundos * 1000 milisegundos
