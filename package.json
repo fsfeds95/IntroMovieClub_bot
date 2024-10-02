@@ -1,16 +1,19 @@
 {
- "name": "telegrambot-themoviedb",
- "version": "V2 - final",
+ "name": "@introCinemaClub_bot on telegram",
+ "version": "1.2.b",
  "description": "Telegram bot to search movies from TheMovieDB API",
  "main": "index.js",
- "scripts": {
-  "start": "node index.js"
- },
  "dependencies": {
   "express": "^4.17.1",
   "telegraf": "^4.4.0",
+  "jimp-compact": "^0.16.1-2",
   "request": "^2.88.2",
-  "jimp-compact": "^0.16.1-2"
+  "node-nlp": "^4.10.1",
+  "xml2js": "^0.4.23"
  },
+ "scripts": {
+  "start": "node index.js"
+ },
+ "author": "Renny Villafranco on Telegram @TackOnes1",
  "license": "MIT"
 }
