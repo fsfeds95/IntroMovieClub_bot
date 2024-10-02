@@ -6,568 +6,187 @@ const port = 8225;
 
 // Importar las dependencias necesarias
 const { Telegraf } = require('telegraf');
-// Importar las bibliotecas requeridas
-const jimp = require('jimp-compact');
 const request = require('request');
+const xml2js = require('xml2js');
 
-const BOT_TOKEN = '7224464210:AAGCXsiW0rClTiXVKmrGYzNjPV_IYs13nR0';
-
-// BASE
-const BASE_URL = 'https://api.themoviedb.org/3';
-// API key TMDB
-const API_KEY = 'api_key=74dc824830c7f93dc61b03e324070886';
-
-// Resolución de imagenes
-const IMG_ORI = 'https://image.tmdb.org/t/p/original';
-const IMG_500 = 'https://image.tmdb.org/t/p/w500';
-const IMG_300 = 'https://image.tmdb.org/t/p/w300';
-const IMG_185 = 'https://image.tmdb.org/t/p/w185';
-const IMG_92 = 'https://image.tmdb.org/t/p/w92';
-// Lenguajes
-const LANG_ES = 'language=es-MX';
-const LANG_EN = 'language=en-US';
+const BOT_TOKEN = '7224464210:AAEaSW07ue0_LGkonUvG3YRezS6zeziGdto';
 
 const bot = new Telegraf(BOT_TOKEN);
 
-// Array para almacenar los IDs de los usuarios
-const userIds = [];
+const RSS_cine = 'https://www.cinemascomics.com/cine/feed/';
+const RSS_serie = 'https://www.cinemascomics.com/series-de-television/feed/';
 
+const extractImage = (content) => {
+ const match = content.match(/<img[^>]+src="([^">]+)"/);
+ return match ? match[1] : null; // Retorna la URL de la primera imagen
+};
 
-//=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=\\
-//                        COMANDOS                       \\
-
-// Respuesta de Bienvenida al comando /start
-bot.start((ctx) => {
- const username = ctx.from.username ? `@${ctx.from.username}` : '';
- const firstName = ctx.from.first_name ? ctx.from.first_name : '';
- const userId = ctx.from.id;
-
- console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} uso : /start"`);
-
- if (!userIds.includes(userId)) {
-  // Agregar el ID si no está ya en el array
-  userIds.push(userId);
- }
-
- ctx.reply(`¡Hola ${firstName} bienvenid@!\n\nCOMANDOS:\n\n/start - Para iniciar el bot.\n\nUsando mi usuario @introCinemaClub_bot, puedes buscar peliculas en modo inline.\n\n/movieid - Para uasar: Envvia /movieId + el titulo de una película.\n\n/imgb - Para uasar: Envvia /imgB + id de una película, y recibiras imagenes Backdrops.\n\n/imgp - Para uasar: Envvia /imgP + id de una película, y recibiras imagenes posters.\n\n/marcab - Para uasar: Responde a una imagen horizontal.\n\n/marcap - Para uasar: Responde a una imagen vertical.`);
-});
-
-// Responde cuando alguien usa el comando /backdrop
-bot.command('marcab', async (ctx) => {
- const username = ctx.from.username ? `@${ctx.from.username}` : '';
- const firstName = ctx.from.first_name ? ctx.from.first_name : '';
- const userId = ctx.from.id;
-
- console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} uso : /backdrop"`);
-
- const waitMessage = await ctx.reply(`Espere un momento ${firstName}...`);
-
- if (ctx.message.reply_to_message && ctx.message.reply_to_message.photo) {
-  const photoId = ctx.message.reply_to_message.photo[3].file_id;
-
-  try {
-   const file = await ctx.telegram.getFile(photoId);
-   const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
-
-   const image = await jimp.read(fileUrl);
-
-   // Redimensionar la imagen usando RESIZE_MAGPHASE
-   image.resize(1280, 720, jimp.RESIZE_MAGPHASE);
-
-   // Cargar las marcas de agua
-   const watermark1 = await jimp.read('Wtxt-Backdrop.png');
-   const watermark2 = await jimp.read('Wlogo-Backdrop.png');
-
-   // Escala la marca de agua a 1280px de ancho por 720px de alto
-   watermark1.resize(1280, 720);
-   watermark2.resize(1280, 720);
-
-   // Establece la opacidad de la watermark1 a 0.375 y watermark2 a 0.75
-   watermark1.opacity(0.08);
-   watermark2.opacity(0.40);
-
-   // Combinar las marcas de agua en una sola imagen
-   watermark1.composite(watermark2, 0, 0, {
-    mode: jimp.BLEND_SOURCE_OVER,
-    opacitySource: 1.0,
-    opacityDest: 1.0
-   });
-
-   // Aplicar la marca de agua a la imagen
-   image.composite(watermark1, 0, 0, {
-    mode: jimp.BLEND_SOURCE_OVER,
-    opacitySource: 1.0,
-    opacityDest: 1.0
-   });
-
-   // Guardar la imagen con la calidad al 100%
-   image.quality(100).scale(1);
-
-   const buffer = await image.getBufferAsync(jimp.MIME_JPEG);
-
-   // Responde con la imagen original y la marca de agua
-   ctx.replyWithPhoto({ source: buffer }, { caption: "¡Tu imagen con marca de agua!" });
-
-   // Elimina el mensaje de espera
-   await ctx.deleteMessage(waitMessage.message_id);
-  } catch (error) {
-   console.log(error);
-   ctx.reply('Hubo un error al agregar la marca de agua a la imagen.');
-
-   // Elimina el mensaje de espera
-   await ctx.deleteMessage(waitMessage.message_id);
-  }
- } else {
-  ctx.reply('Por favor, responde a una imagen con /backdrop para agregarle una marca de agua a la imagen.');
-
-  // Elimina el mensaje de espera
-  await ctx.deleteMessage(waitMessage.message_id);
- }
-});
-
-// Responde cuando alguien usa el comando /Poster
-bot.command('marcap', async (ctx) => {
- const username = ctx.from.username ? `@${ctx.from.username}` : '';
- const firstName = ctx.from.first_name ? ctx.from.first_name : '';
- const userId = ctx.from.id;
-
- console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} uso : /backdrop"`);
-
- const waitMessage = await ctx.reply(`Espere un momento ${firstName}...`);
-
- if (ctx.message.reply_to_message && ctx.message.reply_to_message.photo) {
-  const photoId = ctx.message.reply_to_message.photo[3].file_id;
-
-  try {
-   const file = await ctx.telegram.getFile(photoId);
-   const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
-
-   const image = await jimp.read(fileUrl);
-
-   // Redimensionar la imagen usando RESIZE_MAGPHASE
-   image.resize(720, 1080, jimp.RESIZE_MAGPHASE);
-
-   // Cargar las marcas de agua
-   const watermark1 = await jimp.read('Wtxt-poster.png');
-   const watermark2 = await jimp.read('Wlogo-poster.png');
-
-   // Escala la marca de agua a 1280px de ancho por 720px de alto
-   watermark1.resize(720, 1080);
-   watermark2.resize(720, 1080);
-
-   // Establece la opacidad de la watermark1 a 0.375 y watermark2 a 0.75
-   watermark1.opacity(0.08);
-   watermark2.opacity(0.40);
-
-   // Combinar las marcas de agua en una sola imagen
-   watermark1.composite(watermark2, 0, 0, {
-    mode: jimp.BLEND_SOURCE_OVER,
-    opacitySource: 1.0,
-    opacityDest: 1.0
-   });
-
-   // Aplicar la marca de agua a la imagen
-   image.composite(watermark1, 0, 0, {
-    mode: jimp.BLEND_SOURCE_OVER,
-    opacitySource: 1.0,
-    opacityDest: 1.0
-   });
-
-   // Guardar la imagen con la calidad al 100%
-   image.quality(100).scale(1);
-
-   const buffer = await image.getBufferAsync(jimp.MIME_JPEG);
-
-   // Responde con la imagen original y la marca de agua
-   ctx.replyWithPhoto({ source: buffer }, { caption: "¡Tu imagen con marca de agua!" });
-
-   // Elimina el mensaje de espera
-   await ctx.deleteMessage(waitMessage.message_id);
-  } catch (error) {
-   console.log(error);
-   ctx.reply('Hubo un error al agregar la marca de agua a la imagen.');
-
-   // Elimina el mensaje de espera
-   await ctx.deleteMessage(waitMessage.message_id);
-  }
- } else {
-  ctx.reply('Por favor, responde a una imagen con /backdrop para agregarle una marca de agua a la imagen.');
-
-  // Elimina el mensaje de espera
-  await ctx.deleteMessage(waitMessage.message_id);
- }
-});
-
-// Comando para buscar backdrops
-bot.command('imgb', (ctx) => {
- const idMovie = ctx.message.text.split(' ')[1]; // Obtiene el ID de la película del mensaje
- const url = `${BASE_URL}/movie/${idMovie}/images?${API_KEY}`;
-
- request(url, (error, response, body) => {
-  if (error) {
-   console.log('Ay, mi amor, algo salió mal:', error);
-   ctx.reply('Ocurrió un error al buscar los backdrops. Intenta de nuevo más tarde.');
-   return;
-  }
-
-  const backdrops = JSON.parse(body).backdrops;
-
-  if (backdrops.length === 0) {
-   ctx.reply('Lo siento, no se encontraron backdrops para esta película.');
-   return;
-  }
-
-  // Filtrar backdrops por idioma
-  const filteredBackdrops = backdrops.filter(backdrop => {
-   return backdrop.iso_639_1 === 'es' || backdrop.iso_639_1 === 'en' || backdrop.iso_639_1 === null;
-  });
-
-  // Agrupar backdrops por idioma
-  const groupedBackdrops = filteredBackdrops.reduce((acc, backdrop) => {
-   const lang = backdrop.iso_639_1 || 'null'; // Usa 'null' si no hay idioma
-   if (!acc[lang]) acc[lang] = [];
-   if (acc[lang].length < 2) acc[lang].push(backdrop);
-   return acc;
-  }, {});
-
-  // Enviar solo dos backdrops por idioma
-  for (const lang in groupedBackdrops) {
-   groupedBackdrops[lang].forEach(backdrop => {
-    const backdropUrl = IMG_ORI + backdrop.file_path; // Genera la URL de cada backdrop
-    ctx.replyWithPhoto(backdropUrl); // Envía la imagen
-   });
-  }
-
-  if (Object.keys(groupedBackdrops).length === 0) {
-   ctx.reply('No se encontraron backdrops en los idiomas deseados.');
+const isValidImageUrl = (url, callback) => {
+ request.head(url, (err, res) => {
+  if (!err && res.statusCode === 200) {
+   callback(true);
+  } else {
+   callback(false);
   }
  });
-});
+};
 
-// Comando para buscar posters
-bot.command('imgp', (ctx) => {
- const idMovie = ctx.message.text.split(' ')[1]; // Obtiene el ID de la película del mensaje
- const url = `${BASE_URL}/movie/${idMovie}/images?${API_KEY}`;
+const fetchCine = (ctx = null) => {
+ request(RSS_cine, (error, response, body) => {
+  if (!error && response.statusCode === 200) {
+   xml2js.parseString(body, (err, result) => {
+    if (!err) {
+     const items = result.rss.channel[0].item;
+     const randomArticles = items.sort(() => 0.5 - Math.random()).slice(0, 3); // Artículos aleatorios
 
- request(url, (error, response, body) => {
-  if (error) {
-   console.log('Ay, mi amor, algo salió mal:', error);
-   ctx.reply('Ocurrió un error al buscar los posters. Intenta de nuevo más tarde.');
-   return;
-  }
+     if (ctx) {
+      randomArticles.forEach(item => {
+       const title = item.title[0];
+       const link = item.link[0];
+       const description = item.description[0];
+       const content = item['content:encoded'][0];
+       const imageUrl = extractImage(content); // Obtener la imagen
+       const hashtags = ['#Cine', '#Noticias', '#Películas', '#Estrenos', '#Cultura', '#Entretenimiento'];
 
-  const posters = JSON.parse(body).posters;
+       // Obtener categorías como texto plano
+       const categoriesText = item.category ? item.category : [];
+       const catReplace = categoriesText.join(' ').replace(/\s/g, '_'); // Reemplaza espacios por guiones bajos
+       const hashtagCat = `#` + catReplace.split('_').join(' #'); // Agrega el símbolo de hashtag
 
-  if (posters.length === 0) {
-   ctx.reply('Lo siento, no se encontraron posters para esta película.');
-   return;
-  }
+       // Crear un conjunto de hashtags únicos
+       const uniqueHashtags = new Set(hashtags);
 
-  // Filtrar posters por idioma
-  const filteredPosters = posters.filter(poster=> {
-   return backdrop.iso_639_1 === 'es' || backdrop.iso_639_1 === 'en' || backdrop.iso_639_1 === null;
-  });
+       // Comparar y eliminar los que ya están en hashtags
+       hashtagCat.split(' ').forEach(cat => {
+        if (cat) {
+         uniqueHashtags.delete(cat); // Elimina si ya existe
+        }
+       });
 
-  // Agrupar posters por idioma
-  const groupedPosters = filteredPosters.reduce((acc, backdrop) => {
-   const lang = backdrop.iso_639_1 || 'null'; // Usa 'null' si no hay idioma
-   if (!acc[lang]) acc[lang] = [];
-   if (acc[lang].length < 2) acc[lang].push(backdrop);
-   return acc;
-  }, {});
+       // Unir los hashtags únicos de nuevo en una cadena
+       const finalHashtags = Array.from(uniqueHashtags).join(' ');
 
-  // Enviar solo dos posters por idioma
-  for (const lang in groupedPosters) {
-   groupedPosters[lang].forEach(poster=> {
-    const backdropUrl = IMG_ORI + backdrop.file_path; // Genera la URL de cada backdrop
-    ctx.replyWithPhoto(backdropUrl); // Envía la imagen
+       const message = `
+⟨📰⟩ #Noticia
+▬▬▬▬▬▬▬▬▬
+⟨🍿⟩ ${title}
+▬▬▬▬▬▬▬▬▬
+⟨💭⟩ Resumen: ${description.substring(0, 1500)}...
+▬▬▬▬▬▬▬▬▬
+${finalHashtags}
+▬▬▬▬▬▬▬▬▬
+`;
+
+       // Verificar si la URL de la imagen es válida
+       isValidImageUrl(imageUrl, (isValid) => {
+        if (isValid) {
+         // Crear un botón para el enlace
+         const button = [{ text: '⟨🗞️⟩ Leer más ⟨🗞️⟩', url: link }];
+         ctx.replyWithPhoto(imageUrl, { caption: message, reply_markup: { inline_keyboard: [button] } })
+          .catch(err => console.error('Error al enviar el mensaje:', err));
+        } else {
+         console.error('URL de imagen no válida:', imageUrl);
+        }
+       });
+      });
+     }
+    } else {
+     console.error('Error al parsear el RSS:', err);
+    }
    });
-  }
-
-  if (Object.keys(groupedPosters).length === 0) {
-   ctx.reply('No se encontraron posters en los idiomas deseados.');
+  } else {
+   console.error('Error al obtener el RSS:', error);
   }
  });
-});
+};
 
-// Comando para buscar información de las películas por título
-bot.command('movieid', (ctx) => {
- const query = ctx.message.text.split(' ')[1]; // Obtiene el título de la película del mensaje
- const url = `${BASE_URL}/search/movie?${API_KEY}&${LANG_ES}&query=${encodeURIComponent(query)}`;
+const fetchSerie = (ctx = null) => {
+ request(RSS_serie, (error, response, body) => {
+  if (!error && response.statusCode === 200) {
+   xml2js.parseString(body, (err, result) => {
+    if (!err) {
+     const items = result.rss.channel[0].item;
+     const randomArticles = items.sort(() => 0.5 - Math.random()).slice(0, 3); // Artículos aleatorios
 
- request(url, (error, response, body) => {
-  if (error) {
-   console.log('Ay, mi amor, algo salió mal:', error);
-   ctx.reply('Ocurrió un error al buscar las películas. Intenta de nuevo más tarde.');
-   return;
+     if (ctx) {
+      randomArticles.forEach(item => {
+       const title = item.title[0];
+       const link = item.link[0];
+       const description = item.description[0];
+       const content = item['content:encoded'][0];
+       const imageUrl = extractImage(content); // Obtener la imagen
+       const hashtags = ['#Cine', '#Noticias', '#Películas', '#Estrenos', '#Cultura', '#Entretenimiento'];
+
+       // Obtener categorías como texto plano
+       const categoriesText = item.category ? item.category : [];
+       const catReplace = categoriesText.join(' ').replace(/\s/g, '_'); // Reemplaza espacios por guiones bajos
+       const hashtagCat = `#` + catReplace.split('_').join(' #'); // Agrega el símbolo de hashtag
+
+       // Crear un conjunto de hashtags únicos
+       const uniqueHashtags = new Set(hashtags);
+
+       // Comparar y eliminar los que ya están en hashtags
+       hashtagCat.split(' ').forEach(cat => {
+        if (cat) {
+         uniqueHashtags.delete(cat); // Elimina si ya existe
+        }
+       });
+
+       // Unir los hashtags únicos de nuevo en una cadena
+       const finalHashtags = Array.from(uniqueHashtags).join(' ');
+
+       const message = `
+⟨📰⟩ #Noticia
+▬▬▬▬▬▬▬▬▬
+⟨🍿⟩ ${title}
+▬▬▬▬▬▬▬▬▬
+⟨💭⟩ Resumen: ${description.substring(0, 1500)}...
+▬▬▬▬▬▬▬▬▬
+${finalHashtags}
+▬▬▬▬▬▬▬▬▬
+`;
+
+       // Verificar si la URL de la imagen es válida
+       isValidImageUrl(imageUrl, (isValid) => {
+        if (isValid) {
+         // Crear un botón para el enlace
+         const button = [{ text: '⟨🗞️⟩ Leer más ⟨🗞️⟩', url: link }];
+         ctx.replyWithPhoto(imageUrl, { caption: message, reply_markup: { inline_keyboard: [button] } })
+          .catch(err => console.error('Error al enviar el mensaje:', err));
+        } else {
+         console.error('URL de imagen no válida:', imageUrl);
+        }
+       });
+      });
+     }
+    } else {
+     console.error('Error al parsear el RSS:', err);
+    }
+   });
+  } else {
+   console.error('Error al obtener el RSS:', error);
   }
-
-  const data = JSON.parse(body);
-
-  if (!data.results || data.results.length === 0) {
-   ctx.reply('Lo siento, no se encontraron películas con ese título.');
-   return;
-  }
-
-  let message = 'Resultados encontrados:\n▬▬▬▬▬▬▬▬▬\n';
-  data.results.forEach(movie => {
-   const movieId = movie.id;
-   const title = movie.title;
-   const releaseDate = movie.release_date.split("-")[0];
-   
-   message += `Título: ${title} (${releaseDate})\nID: ${movieId}\n\n▬▬▬▬▬▬▬▬▬\n\n`;
-  });
-
-  ctx.reply(message);
  });
-});
+};
 
-// Iniciamos la búsqueda inline
-bot.on('inline_query', async (ctx) => {
- const query = ctx.inlineQuery.query;
- const url = `${BASE_URL}/search/movie?${API_KEY}&${LANG_ES}&query=${encodeURIComponent(query)}`;
+bot.start((ctx) => ctx.reply('¡Hola! Estoy aquí para traerte artículos de cine y series.\n\nPuedes usar el comando /cine para obtener 3 artículos de cine aleatorias.\n\nPuedes usar el comando /serie para obtener 3 artículos de series aleatorias'));
 
- request(url, async (error, response, body) => {
-  if (error) {
-   console.log('Ay, mi amor, algo salió mal:', error);
-   ctx.answerInlineQuery([{ type: 'article', id: 'error', title: 'Error', input_message_content: { message_text: 'Lo siento, ocurrió un error. Intenta de nuevo más tarde.' } }]);
-   return;
-  }
+// Enviar artículos aleatorios
+bot.command('cine', (ctx) => fetchCine(ctx));
 
-  const results = JSON.parse(body).results;
-  const resultsList = await Promise.all(results.map(async movie => {
-   const id = movie.id;
-   const title = movie.title;
-   const initial = movie.title.substring(0, 1); // Cambiado aquí
-   const originalTitle = movie.original_title;
-   const releaseYear = movie.release_date.split("-")[0];
-   const posterPath = movie.poster_path;
-   const langCode = movie.original_language;
-   const overview = movie.overview;
-   const genre = movie.genre_ids;
+// Enviar artículos aleatorios
+bot.command('serie', (ctx) => fetchSerie(ctx));
 
-   const langComplete = getLanguage(langCode);
-   const genreEs = getGenres(genre);
-   const durationTime = await getDurationMovie(id);
-   const actors = await getActorsMovie(id);
+// Mantiene el bot vivo y envía solo el último artículo
+setInterval(() => fetchCine(), 60000);
 
-   return {
-    type: 'article',
-    id: id,
-    title: `${title} (${releaseYear})`,
-    input_message_content: {
-     message_text: `⟨🔠⟩ #${initial}\n▬▬▬▬▬▬▬▬▬\n⟨🍿⟩ ${title} (${releaseYear})\n⟨🎥⟩ ${originalTitle}\n▬▬▬▬▬▬▬▬▬\n⟨⭐⟩ Tipo : #Pelicula\n⟨🎟⟩ Estreno: #Año${releaseYear}\n⟨🗣️⟩ Idioma Original: ${langComplete}\n⟨🔊⟩ Audio: 🇲🇽 #Dual_Latino\n⟨📺⟩ Calidad: #HD\n⟨⏳⟩ Duración: ${durationTime}\n⟨🎭⟩ Género: ${genreEs}\n⟨👤⟩ Reparto: ${actors}\n▬▬▬▬▬▬▬▬▬\n⟨💭⟩ Sinopsis: ${overview}\n▬▬▬▬▬▬▬▬▬\n\n\nhttps://fsfeds95.github.io/introMovieClub/moreImage.html?idMovie=${id}`
-    },
-    thumb_url: IMG_92 + posterPath,
-    description: `${originalTitle}\n${overview.substring(0, 100)}...`, // Cambiado aquí()
-   };
-  }));
-
-  ctx.answerInlineQuery(resultsList);
- });
-});
-
-//=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=\\
-//                        EVENTOS                        \\
-
-// Ve los voice
-bot.on('voice', (ctx) => {
- const username = ctx.from.username ? `@${ctx.from.username}` : '';
- const firstName = ctx.from.first_name ? ctx.from.first_name : '';
- const userId = ctx.from.id;
-
- console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio un voice"`);
-
- ctx.reply('Formato no válido');
-});
-
-// Ve los fotos
-bot.on('photo', (ctx) => {
- const username = ctx.from.username ? `@${ctx.from.username}` : '';
- const firstName = ctx.from.first_name ? ctx.from.first_name : '';
- const userId = ctx.from.id;
-
- console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio una foto"`);
-
- // Envía la url al chat
- ctx.reply(`¡Imagen recibida! gracias por enviala ${firstName}\nPuedes usar:\n/backdrop para hacer una marca de agua.`);
-});
-
-// Ve los videos
-bot.on('video', (ctx) => {
- const username = ctx.from.username ? `@${ctx.from.username}` : '';
- const firstName = ctx.from.first_name ? ctx.from.first_name : '';
- const userId = ctx.from.id;
-
- console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio un video"`);
-
- ctx.reply('¡Has enviado un video!');
-});
-
-// Ve los documentos/archivos
-bot.on('document', (ctx) => {
- const username = ctx.from.username ? `@${ctx.from.username}` : '';
- const firstName = ctx.from.first_name ? ctx.from.first_name : '';
- const userId = ctx.from.id;
-
- console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio un documento"`);
-
- ctx.reply('¡Has enviado un documento!');
-});
-
-// Ve los audios
-bot.on('audio', (ctx) => {
- const username = ctx.from.username ? `@${ctx.from.username}` : '';
- const firstName = ctx.from.first_name ? ctx.from.first_name : '';
- const userId = ctx.from.id;
-
- console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio un audio"`);
-
- ctx.reply('¡Has enviado un audio!');
-});
-
-// Responde cuando alguien responde a la imagen
-bot.on('reply_to_message', (ctx) => {
- const username = ctx.from.username ? `@${ctx.from.username}` : '';
- const firstName = ctx.from.first_name ? ctx.from.first_name : '';
- const userId = ctx.from.id;
-
- console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} respondio a una imagen"`);
-
- if (ctx.message.reply_to_message.photo) {
-  ctx.reply("¡Gracias por tu respuesta! ¿Qué te parece la imagen?");
- }
-});
-
-// Ve los stickers
-bot.on('sticker', (ctx) => {
- const username = ctx.from.username ? `@${ctx.from.username}` : '';
- const firstName = ctx.from.first_name ? ctx.from.first_name : '';
- const userId = ctx.from.id;
-
- console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio un stickers"`);
-
- ctx.reply('Formato no válido');
-});
-
-// Repite todoo lo que le escribas
-bot.on('text', (ctx) => {
- const username = ctx.from.username ? `@${ctx.from.username}` : '';
- const firstName = ctx.from.first_name ? ctx.from.first_name : '';
- const userId = ctx.from.id;
-
- console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio un texto"`);
-
- ctx.reply('' + ctx.message.text);
-});
-
-// Para otros tipos de archivos
-bot.on('message', (ctx) => {
- const username = ctx.from.username ? `@${ctx.from.username}` : '';
- const firstName = ctx.from.first_name ? ctx.from.first_name : '';
- const userId = ctx.from.id;
-
- console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio un tipo de archivo no valido"`);
-
- ctx.reply('¡Ups! Parece que has enviado un formato de archivo no válido. Por favor, intenta enviar una imagen, video, documento o audio en su lugar. ¡Gracias!');
-});
-
-//=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=\\
-//                       FUNCIONES                       \\
-
-// Función: Traducir el lenguaje.
-function getLanguage(languageCode) {
- const languages = {
-  en: "🇺🇸 #Ingles",
-  ca: "🇪🇸 #Catalan",
-  fr: "🇫🇷 #Frances",
-  de: "🇩🇪 #Aleman",
-  it: "🇮🇹 #Italiano",
-  ja: "🇯🇵 #Japones",
-  ru: "🇷🇺 #Ruso",
-  zh: "🇨🇳 #Chino",
-  pl: "🇵🇱 #Polaco",
-  ko: "🇰🇷 / 🇰🇵 #Coreano",
-  es: "🇲🇽 / 🇪🇸 #Español",
- };
- return languages[languageCode] || languageCode;
-}
-
-// Función: Obtener la duración de la película.
-async function getDurationMovie(id) {
- return new Promise((resolve, reject) => {
-  request(`${BASE_URL}/movie/${id}?${API_KEY}&${LANG_ES}`, (error, response, body) => {
-   if (error) {
-    console.log(error);
-    reject(error);
-   }
-   const duracion = JSON.parse(body).runtime;
-   const horas = Math.floor(duracion / 60);
-   const minutos = duracion % 60;
-   resolve(`${horas}h ${minutos}m`);
-  });
- });
-}
-
-function getGenres(genreIds) {
- const genres = {
-  12: "#Aventura",
-  14: "#Fantasia",
-  16: "#Animacion",
-  18: "#Drama",
-  27: "#Terror",
-  28: "#Accion",
-  35: "#Comedia",
-  36: "#Historia",
-  37: "#Oeste",
-  53: "#Suspenso",
-  80: "#Crimen",
-  99: "#Documental",
-  878: "#Ciencia_Ficcion",
-  9648: "#Misterio",
-  10402: "#Musica",
-  10749: "#Romance",
-  10751: "#Familiar",
-  10752: "#Belica",
-  10759: "#Accion_y_Aventura",
-  10762: "#Infantil",
-  10763: "#Noticias",
-  10764: "#Realidad",
-  10765: "#Ciencia_Ficcion_y_Fantasia",
-  10766: "#Serial",
-  10767: "#Conversacion",
-  10768: "#Politico",
-  10769: "#Opcion_Interactiva"
- };
-
- const genreList = genreIds.map(genreId => genres[genreId]).filter(Boolean);
- return genreList.join(" ");
-}
-
-// Función: Obtener actores.
-async function getActorsMovie(id) {
- return new Promise((resolve, reject) => {
-  request(`${BASE_URL}/movie/${id}/credits?${API_KEY}&${LANG_ES}`, (error, response, body) => {
-   if (error) {
-    console.log('Ay, mi amor, algo salió mal:', error);
-    reject(error);
-   }
-   const relevantActors = JSON.parse(body).cast.filter(actor => actor.order <= 4);
-   const actorNames = relevantActors.map(actor => `#${actor.name.replace(/\s/g, '_').replace(/'/g, '').replace(/-/g, '')} (${actor.character.replace(' (voice)', '').replace(' (hiccups)', '').replace(' (uncredited)', '')})`);
-   resolve(actorNames.join("\n                  "));
-  });
- });
-}
-
+// Mantiene el bot vivo y envía solo el último artículo
+setInterval(() => fetchSerie(), 60000);
 
 bot.launch();
 
-
-//=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=\\
-
 // Ruta "/ping"
 app.get('/ping', (req, res) => {
- // Enviar una respuesta vacía
  res.send('');
 });
 
@@ -580,12 +199,10 @@ app.listen(port, () => {
   fetch(`http://localhost:${port}/ping`)
    .then(response => {
     const currentDate = new Date().toLocaleString("es-VE", { timeZone: "America/Caracas" });
-    const formattedTime = currentDate;
-    console.log(`Sigo vivo 🎉 (${formattedTime})`);
+    console.log(`Sigo vivo 🎉 (${currentDate})`);
    })
    .catch(error => {
     console.error('Error en la solicitud de ping:', error);
    });
- }, 5 * 60 * 1000);
- // 30 minutos * 60 segundos * 1000 milisegundos
+ }, 5 * 60 * 1000); // 5 m * 60 s * 1000 ms
 });
