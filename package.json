@@ -7,11 +7,16 @@
   "express": "^4.17.1",
   "telegraf": "^4.0.0",
   "request": "^2.88.2",
-  "node-nlp": "^4.10.1",
-  "xml2js": "^0.4.23"
+  "xml2js": "^0.4.23",
+  "bottleneck": "^2.19.5",
+  "pm2": "^5.1.0"
+ },
+ "engines": {
+  "node": ">=12.0.0"
  },
  "scripts": {
-  "start": "node index.js"
+  "start": "node index.js",
+  "start:pm2": "pm2 start index.js --name 'telegram-news-bot'"
  },
  "author": "Ericka Benucci",
  "license": "MIT"
