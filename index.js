@@ -246,9 +246,15 @@ bot.on('message', (ctx) => {
 setInterval(() => {
  if (lastCtx) {
    fetchCine(lastCtx); // Envía artículos al último contexto
+ }
+}, 43200000); // Cada 60 segundos
+
+// Mantiene el bot vivo y envía artículos cada minuto
+setInterval(() => {
+ if (lastCtx) {
    fetchSerie(lastCtx);
  }
-}, 60000); // Cada 60 segundos
+}, 86400000); // Cada 60 segundos
 
 bot.launch(); // Inicia el bot
 
