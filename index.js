@@ -9,7 +9,7 @@ const Bottleneck = require('bottleneck'); // Para limitar conexiones
 const app = express();
 const port = 8225; // Puerto donde se ejecutará el servidor
 
-const BOT_TOKEN = '7224464210:AAGXGLdOPjUSaa6d1Wu7Qa8I6bS5OpMbLHI'; // Token del bot de Telegram
+const BOT_TOKEN = '7224464210:AAFk-AEAFUu-BG-0rBefuNI-eLZCEcM2DHk'; // Token del bot de Telegram
 const bot = new Telegraf(BOT_TOKEN); // Inicializa el bot
 
 let lastCtx = null; // Variable para guardar el último contexto
@@ -24,7 +24,7 @@ const sentSerieIds = new Set();
 
 // Configuración del limitador
 const limiter = new Bottleneck({
- minTime: 60000, // Espera 60 segundo entre cada solicitud
+ minTime: 30000, // Espera 30 segundo entre cada solicitud
 });
 
 // Función para extraer la URL de la primera imagen del contenido
@@ -276,6 +276,8 @@ bot.launch(); // Inicia el bot
 
 // Ruta "/ping" para verificar que el servidor está funcionando
 app.get('/ping', (req, res) => {
+ const currentDate = new Date().toLocaleString("es-VE", { timeZone: "America/Caracas" });
+ console.log(`Sigo vivo 🎉 (${currentDate})`);
  res.send('');
 });
 
