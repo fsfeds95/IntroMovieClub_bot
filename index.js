@@ -8,7 +8,7 @@ const xml2js = require('xml2js'); // Para convertir XML a JSON
 const app = express();
 const port = 8225; // Puerto donde se ejecutará el servidor
 
-const BOT_TOKEN = '7224464210:AAGhhGrLV0NqgJKOl0Dcbl7TIUXCXTt0fOU'; // Token del bot de Telegram
+const BOT_TOKEN = '7224464210:AAGXGLdOPjUSaa6d1Wu7Qa8I6bS5OpMbLHI'; // Token del bot de Telegram
 const bot = new Telegraf(BOT_TOKEN); // Inicializa el bot
 
 let lastCtx = null; // Variable para guardar el último contexto
