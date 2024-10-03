@@ -11,6 +11,8 @@ const port = 8225; // Puerto donde se ejecutará el servidor
 const BOT_TOKEN = '7224464210:AAGhhGrLV0NqgJKOl0Dcbl7TIUXCXTt0fOU'; // Token del bot de Telegram
 const bot = new Telegraf(BOT_TOKEN); // Inicializa el bot
 
+let lastCtx = null; // Variable para guardar el último contexto
+
 // URLs de los feeds RSS
 const RSS_cine = 'https://www.cinemascomics.com/cine/feed/';
 const RSS_serie = 'https://www.cinemascomics.com/series-de-television/feed/';
@@ -39,8 +41,9 @@ const fetchCine = (ctx = null) => {
    xml2js.parseString(body, (err, result) => {
     if (!err) {
      const items = result.rss.channel[0].item; // Obtiene los artículos del feed
+     const randomArticles = items.sort(() => 0.5 - Math.random()).slice(0, 3); // Artículos aleatorios
 
-     items.forEach(item => {
+     randomArticles.forEach(item => {
       const id = item.link[0]; // Usamos el enlace como ID único
       if (!sentCineIds.has(id)) { // Verificamos si ya fue enviado
        sentCineIds.add(id); // Añadimos a los enviados
@@ -108,8 +111,9 @@ const fetchSerie = (ctx = null) => {
    xml2js.parseString(body, (err, result) => {
     if (!err) {
      const items = result.rss.channel[0].item; // Obtiene los artículos del feed
+     const randomArticles = items.sort(() => 0.5 - Math.random()).slice(0, 3); // Artículos aleatorios
 
-     items.forEach(item => {
+     randomArticles.forEach(item => {
       const id = item.link[0]; // Usamos el enlace como ID único
       if (!sentSerieIds.has(id)) { // Verificamos si ya fue enviado
        sentSerieIds.add(id); // Añadimos a los enviados
@@ -183,6 +187,7 @@ bot.start((ctx) => {
 
 // Comando para obtener artículos de cine
 bot.command('cine', (ctx) => {
+ lastCtx = ctx; // Guarda el contexto
  const username = ctx.from.username ? `@${ctx.from.username}` : '';
  const firstName = ctx.from.first_name ? ctx.from.first_name : '';
  const userId = ctx.from.id;
@@ -194,6 +199,7 @@ bot.command('cine', (ctx) => {
 
 // Comando para obtener artículos de series
 bot.command('serie', (ctx) => {
+ lastCtx = ctx; // Guarda el contexto
  const username = ctx.from.username ? `@${ctx.from.username}` : '';
  const firstName = ctx.from.first_name ? ctx.from.first_name : '';
  const userId = ctx.from.id;
@@ -237,8 +243,12 @@ bot.on('message', (ctx) => {
 });
 
 // Mantiene el bot vivo y envía artículos cada minuto
-setInterval(() => fetchCine(), 60000); // Cada 60 segundos
-setInterval(() => fetchSerie(), 60000); // Cada 60 segundos
+setInterval(() => {
+ if (lastCtx) {
+   fetchCine(lastCtx); // Envía artículos al último contexto
+   fetchSerie(lastCtx);
+ }
+}, 60000); // Cada 60 segundos
 
 bot.launch(); // Inicia el bot
 
