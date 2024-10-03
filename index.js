@@ -9,20 +9,9 @@ const { Telegraf } = require('telegraf');
 const request = require('request');
 const xml2js = require('xml2js');
 
-const BOT_TOKEN = '7224464210:AAEaSW07ue0_LGkonUvG3YRezS6zeziGdto';
+const BOT_TOKEN = '7723354766:AAFlbfzZWUnQ7rAed69_yF0g2U-g2bMjAmg';
 
 const bot = new Telegraf(BOT_TOKEN);
-
-bot.start((ctx) => {
- const username = ctx.from.username ? `@${ctx.from.username}` : '';
- const firstName = ctx.from.first_name ? ctx.from.first_name : '';
- const userId = ctx.from.id;
-
-
- console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} uso : /start"`);
-
- ctx.reply('¡Hola! Estoy aquí para traerte artículos de cine y series.\n\nPuedes usar el comando /cine para obtener 3 artículos de cine aleatorias.\n\nPuedes usar el comando /serie para obtener 3 artículos de series aleatorias')
-});
 
 const RSS_cine = 'https://www.cinemascomics.com/cine/feed/';
 const RSS_serie = 'https://www.cinemascomics.com/series-de-television/feed/';
@@ -180,6 +169,21 @@ ${finalHashtags}
  });
 };
 
+//=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=\\
+//                        COMANDOS                       \\
+
+// Respuesta de Bienvenida al comando /start
+bot.start((ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} uso : /start"`);
+
+ ctx.reply('¡Hola! Estoy aquí para traerte artículos de cine y series.\n\nPuedes usar el comando /cine para obtener 3 artículos de cine aleatorias.\n\nPuedes usar el comando /serie para obtener 3 artículos de series aleatorias')
+});
+
 // Enviar artículos aleatorios
 bot.command('cine', (ctx) => {
  const username = ctx.from.username ? `@${ctx.from.username}` : '';
@@ -201,6 +205,112 @@ bot.command('serie', (ctx) => {
 
  fetchSerie(ctx)
 });
+
+//=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=•=\\
+//                        EVENTOS                        \\
+
+// Ve los voice
+bot.on('voice', (ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio un voice"`);
+
+ ctx.reply('¡Ups! Parece que has enviado un formato de archivo no válido.');
+});
+
+// Ve los fotos
+bot.on('photo', (ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio una foto"`);
+
+ // Envía la url al chat
+ ctx.reply('¡Ups! Parece que has enviado un formato de archivo no válido.');
+});
+
+// Ve los videos
+bot.on('video', (ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio un video"`);
+
+ ctx.reply('¡Ups! Parece que has enviado un formato de archivo no válido.');
+});
+
+// Ve los documentos/archivos
+bot.on('document', (ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio un documento"`);
+
+ ctx.reply('¡Ups! Parece que has enviado un formato de archivo no válido.');
+});
+
+// Ve los audios
+bot.on('audio', (ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio un audio"`);
+
+ ctx.reply('¡Ups! Parece que has enviado un formato de archivo no válido.');
+});
+
+// Responde cuando alguien responde a la imagen
+bot.on('reply_to_message', (ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} respondio a una imagen"`);
+
+ if (ctx.message.reply_to_message.photo) {
+  ctx.reply('');
+ }
+});
+
+// Ve los stickers
+bot.on('sticker', (ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio un stickers"`);
+
+ ctx.reply('¡Ups! Parece que has enviado un formato de archivo no válido.');
+});
+
+// Repite todoo lo que le escribas
+bot.on('text', (ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio un texto"`);
+
+ ctx.reply('Tu texto es: ' + ctx.message.text);
+});
+
+// Para otros tipos de archivos
+bot.on('message', (ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} envio un tipo de archivo no valido"`);
+
+ ctx.reply('¡Ups! Parece que has enviado un formato de archivo no válido.');
+});
+
 
 // Mantiene el bot vivo y envía solo el último artículo
 setInterval(() => fetchCine(), 60000);
