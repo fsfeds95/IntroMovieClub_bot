@@ -3,6 +3,7 @@ const express = require('express'); // Para crear el servidor web
 const { Telegraf } = require('telegraf'); // Para interactuar con la API de Telegram
 const request = require('request'); // Para hacer solicitudes HTTP
 const xml2js = require('xml2js'); // Para convertir XML a JSON
+const Bottleneck = require('bottleneck'); // Para limitar conexiones
 
 // Crear una aplicación en Express
 const app = express();
@@ -21,6 +22,11 @@ const RSS_serie = 'https://www.cinemascomics.com/series-de-television/feed/';
 const sentCineIds = new Set();
 const sentSerieIds = new Set();
 
+// Configuración del limitador
+const limiter = new Bottleneck({
+ minTime: 60000, // Espera 60 segundo entre cada solicitud
+});
+
 // Función para extraer la URL de la primera imagen del contenido
 const extractImage = (content) => {
  const match = content.match(/<img[^>]+src="([^">]+)"/);
@@ -36,41 +42,42 @@ const isValidImageUrl = (url, callback) => {
 
 // Función para obtener y enviar artículos de cine
 const fetchCine = (ctx = null) => {
- request(RSS_cine, (error, response, body) => {
-  if (!error && response.statusCode === 200) {
-   xml2js.parseString(body, (err, result) => {
-    if (!err) {
-     const items = result.rss.channel[0].item; // Obtiene los artículos del feed
-     const randomArticles = items.sort(() => 0.5 - Math.random()).slice(0, 3); // Artículos aleatorios
+ return new Promise((resolve, reject) => {
+  request(RSS_cine, (error, response, body) => {
+   if (!error && response.statusCode === 200) {
+    xml2js.parseString(body, (err, result) => {
+     if (!err) {
+      const items = result.rss.channel[0].item; // Obtiene los artículos del feed
+      const randomArticles = items.sort(() => 0.5 - Math.random()).slice(0, 3); // Artículos aleatorios
 
-     randomArticles.forEach(item => {
-      const id = item.link[0]; // Usamos el enlace como ID único
-      if (!sentCineIds.has(id)) { // Verificamos si ya fue enviado
-       sentCineIds.add(id); // Añadimos a los enviados
+      randomArticles.forEach(item => {
+       const id = item.link[0]; // Usamos el enlace como ID único
+       if (!sentCineIds.has(id)) { // Verificamos si ya fue enviado
+        sentCineIds.add(id); // Añadimos a los enviados
 
-       // Extraemos información del artículo
-       const title = item.title[0];
-       const link = item.link[0];
-       const description = item.description[0];
-       const content = item['content:encoded'][0];
-       const imageUrl = extractImage(content); // Obtener la imagen
-       const hashtags = ['#Cine', '#Noticias', '#Películas', '#Estrenos', '#Cultura', '#Entretenimiento', '#introCinemaClub'];
+        // Extraemos información del artículo
+        const title = item.title[0];
+        const link = item.link[0];
+        const description = item.description[0];
+        const content = item['content:encoded'][0];
+        const imageUrl = extractImage(content); // Obtener la imagen
+        const hashtags = ['#Cine', '#Noticias', '#Películas', '#Estrenos', '#Cultura', '#Entretenimiento', '#introCinemaClub'];
 
-       // Procesar categorías para crear hashtags
-       const categoriesText = item.category ? item.category : [];
-       const catReplace = categoriesText.join(' ').replace(/\s/g, '_');
-       const hashtagCat = `#` + catReplace.split('_').join(' #');
+        // Procesar categorías para crear hashtags
+        const categoriesText = item.category ? item.category : [];
+        const catReplace = categoriesText.join(' ').replace(/\s/g, '_');
+        const hashtagCat = `#` + catReplace.split('_').join(' #');
 
-       const uniqueHashtags = new Set(hashtags);
-       hashtagCat.split(' ').forEach(cat => {
-        if (cat) {
-         uniqueHashtags.delete(cat); // Elimina si ya existe
-        }
-       });
+        const uniqueHashtags = new Set(hashtags);
+        hashtagCat.split(' ').forEach(cat => {
+         if (cat) {
+          uniqueHashtags.delete(cat); // Elimina si ya existe
+         }
+        });
 
-       const finalHashtags = Array.from(uniqueHashtags).join(' '); // Combina los hashtags únicos
+        const finalHashtags = Array.from(uniqueHashtags).join(' '); // Combina los hashtags únicos
 
-       const message = `
+        const message = `
 ⟨📰⟩ #Noticia
 ▬▬▬▬▬▬▬▬▬
 ⟨🍿⟩ ${title}
@@ -81,66 +88,71 @@ ${finalHashtags}
 ▬▬▬▬▬▬▬▬▬
 `;
 
-       // Verificar si la URL de la imagen es válida
-       isValidImageUrl(imageUrl, (isValid) => {
-        if (isValid) {
-         // Crear un botón para el enlace
-         const button = [{ text: '⟨🗞️⟩ Leer más ⟨🗞️⟩', url: link }];
-         bot.telegram.sendPhoto(ctx.chat.id, imageUrl, { caption: message, reply_markup: { inline_keyboard: [button] } })
-          .catch(err => console.error('Error al enviar el mensaje:', err)); // Manejo de errores
-        } else {
-         console.error('URL de imagen no válida:', imageUrl);
-        }
-       });
-      }
-     });
-    } else {
-     console.error('Error al parsear el RSS:', err);
-    }
-   });
-  } else {
-   console.error('Error al obtener el RSS:', error);
-  }
+        // Verificar si la URL de la imagen es válida
+        isValidImageUrl(imageUrl, (isValid) => {
+         if (isValid) {
+          // Crear un botón para el enlace
+          const button = [{ text: '⟨🗞️⟩ Leer más ⟨🗞️⟩', url: link }];
+          bot.telegram.sendPhoto(ctx.chat.id, imageUrl, { caption: message, reply_markup: { inline_keyboard: [button] } })
+           .catch(err => console.error('Error al enviar el mensaje:', err)); // Manejo de errores
+         } else {
+          console.error('URL de imagen no válida:', imageUrl);
+         }
+        });
+       }
+      });
+      resolve(); // Resuelve la promesa
+     } else {
+      console.error('Error al parsear el RSS:', err);
+      reject(err); // Rechaza la promesa
+     }
+    });
+   } else {
+    console.error('Error al obtener el RSS:', error);
+    reject(error); // Rechaza la promesa
+   }
+  });
  });
 };
 
 // Función para obtener y enviar artículos de series
 const fetchSerie = (ctx = null) => {
- request(RSS_serie, (error, response, body) => {
-  if (!error && response.statusCode === 200) {
-   xml2js.parseString(body, (err, result) => {
-    if (!err) {
-     const items = result.rss.channel[0].item; // Obtiene los artículos del feed
-     const randomArticles = items.sort(() => 0.5 - Math.random()).slice(0, 3); // Artículos aleatorios
+ return new Promise((resolve, reject) => {
+  request(RSS_serie, (error, response, body) => {
+   if (!error && response.statusCode === 200) {
+    xml2js.parseString(body, (err, result) => {
+     if (!err) {
+      const items = result.rss.channel[0].item; // Obtiene los artículos del feed
+      const randomArticles = items.sort(() => 0.5 - Math.random()).slice(0, 3); // Artículos aleatorios
 
-     randomArticles.forEach(item => {
-      const id = item.link[0]; // Usamos el enlace como ID único
-      if (!sentSerieIds.has(id)) { // Verificamos si ya fue enviado
-       sentSerieIds.add(id); // Añadimos a los enviados
+      randomArticles.forEach(item => {
+       const id = item.link[0]; // Usamos el enlace como ID único
+       if (!sentSerieIds.has(id)) { // Verificamos si ya fue enviado
+        sentSerieIds.add(id); // Añadimos a los enviados
 
-       // Extraemos información del artículo
-       const title = item.title[0];
-       const link = item.link[0];
-       const description = item.description[0];
-       const content = item['content:encoded'][0];
-       const imageUrl = extractImage(content); // Obtener la imagen
-       const hashtags = ['#Cine', '#Noticias', '#Películas', '#Estrenos', '#Cultura', '#Entretenimiento', '#introCinemaClub'];
+        // Extraemos información del artículo
+        const title = item.title[0];
+        const link = item.link[0];
+        const description = item.description[0];
+        const content = item['content:encoded'][0];
+        const imageUrl = extractImage(content); // Obtener la imagen
+        const hashtags = ['#Cine', '#Noticias', '#Películas', '#Estrenos', '#Cultura', '#Entretenimiento', '#introCinemaClub'];
 
-       // Procesar categorías para crear hashtags
-       const categoriesText = item.category ? item.category : [];
-       const catReplace = categoriesText.join(' ').replace(/\s/g, '_');
-       const hashtagCat = `#` + catReplace.split('_').join(' #');
+        // Procesar categorías para crear hashtags
+        const categoriesText = item.category ? item.category : [];
+        const catReplace = categoriesText.join(' ').replace(/\s/g, '_');
+        const hashtagCat = `#` + catReplace.split('_').join(' #');
 
-       const uniqueHashtags = new Set(hashtags);
-       hashtagCat.split(' ').forEach(cat => {
-        if (cat) {
-         uniqueHashtags.delete(cat); // Elimina si ya existe
-        }
-       });
+        const uniqueHashtags = new Set(hashtags);
+        hashtagCat.split(' ').forEach(cat => {
+         if (cat) {
+          uniqueHashtags.delete(cat); // Elimina si ya existe
+         }
+        });
 
-       const finalHashtags = Array.from(uniqueHashtags).join(' '); // Combina los hashtags únicos
+        const finalHashtags = Array.from(uniqueHashtags).join(' '); // Combina los hashtags únicos
 
-       const message = `
+        const message = `
 ⟨📰⟩ #Noticia
 ▬▬▬▬▬▬▬▬▬
 ⟨🍿⟩ ${title}
@@ -151,26 +163,30 @@ ${finalHashtags}
 ▬▬▬▬▬▬▬▬▬
 `;
 
-       // Verificar si la URL de la imagen es válida
-       isValidImageUrl(imageUrl, (isValid) => {
-        if (isValid) {
-         // Crear un botón para el enlace
-         const button = [{ text: '⟨🗞️⟩ Leer más ⟨🗞️⟩', url: link }];
-         bot.telegram.sendPhoto(ctx.chat.id, imageUrl, { caption: message, reply_markup: { inline_keyboard: [button] } })
-          .catch(err => console.error('Error al enviar el mensaje:', err)); // Manejo de errores
-        } else {
-         console.error('URL de imagen no válida:', imageUrl);
-        }
-       });
-      }
-     });
-    } else {
-     console.error('Error al parsear el RSS:', err);
-    }
-   });
-  } else {
-   console.error('Error al obtener el RSS:', error);
-  }
+        // Verificar si la URL de la imagen es válida
+        isValidImageUrl(imageUrl, (isValid) => {
+         if (isValid) {
+          // Crear un botón para el enlace
+          const button = [{ text: '⟨🗞️⟩ Leer más ⟨🗞️⟩', url: link }];
+          bot.telegram.sendPhoto(ctx.chat.id, imageUrl, { caption: message, reply_markup: { inline_keyboard: [button] } })
+           .catch(err => console.error('Error al enviar el mensaje:', err)); // Manejo de errores
+         } else {
+          console.error('URL de imagen no válida:', imageUrl);
+         }
+        });
+       }
+      });
+      resolve(); // Resuelve la promesa
+     } else {
+      console.error('Error al parsear el RSS:', err);
+      reject(err); // Rechaza la promesa
+     }
+    });
+   } else {
+    console.error('Error al obtener el RSS:', error);
+    reject(error); // Rechaza la promesa
+   }
+  });
  });
 };
 
@@ -194,7 +210,7 @@ bot.command('cine', (ctx) => {
 
  console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} uso : /cine"`);
 
- fetchCine(ctx); // Llama a la función para obtener artículos de cine
+ limiter.schedule(() => fetchCine(ctx)).catch(err => console.error('Error en fetchCine:', err));
 });
 
 // Comando para obtener artículos de series
@@ -206,7 +222,7 @@ bot.command('serie', (ctx) => {
 
  console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} uso : /serie"`);
 
- fetchSerie(ctx); // Llama a la función para obtener artículos de series
+ limiter.schedule(() => fetchSerie(ctx)).catch(err => console.error('Error en fetchSerie:', err));
 });
 
 // Manejadores de eventos para diferentes tipos de mensajes
@@ -242,19 +258,19 @@ bot.on('message', (ctx) => {
  ctx.reply('¡Ups! Parece que has enviado un formato de archivo no válido.');
 });
 
-// Mantiene el bot vivo y envía artículos cada minuto
+// Mantiene el bot vivo y envía artículos cada 12 horas
 setInterval(() => {
  if (lastCtx) {
-   fetchCine(lastCtx); // Envía artículos al último contexto
+  limiter.schedule(() => fetchCine(lastCtx)).catch(err => console.error('Error en fetchCine desde intervalo:', err));
  }
-}, 43200000); // Cada 60 segundos
+}, 43200000); // Cada 12 horas
 
-// Mantiene el bot vivo y envía artículos cada minuto
+// Mantiene el bot vivo y envía artículos cada 24 horas
 setInterval(() => {
  if (lastCtx) {
-   fetchSerie(lastCtx);
+  limiter.schedule(() => fetchSerie(lastCtx)).catch(err => console.error('Error en fetchSerie desde intervalo:', err));
  }
-}, 86400000); // Cada 60 segundos
+}, 86400000); // Cada 24 horas
 
 bot.launch(); // Inicia el bot
 
