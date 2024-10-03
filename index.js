@@ -14,6 +14,8 @@ const bot = new Telegraf(BOT_TOKEN); // Inicializa el bot
 
 let lastCtx = null; // Variable para guardar el último contexto
 
+const ALLOWED_USER_ID = 6839704393; // Reemplaza con el ID del usuario permitido
+
 // URLs de los feeds RSS
 const RSS_cine = 'https://www.cinemascomics.com/cine/feed/';
 const RSS_serie = 'https://www.cinemascomics.com/series-de-television/feed/';
@@ -203,6 +205,10 @@ bot.start((ctx) => {
 
 // Comando para obtener artículos de cine
 bot.command('cine', (ctx) => {
+ if (ctx.from.id !== ALLOWED_USER_ID) {
+  return ctx.reply('Lo siento, no tienes permiso para usar este comando.'); // Mensaje de error
+ }
+
  lastCtx = ctx; // Guarda el contexto
  const username = ctx.from.username ? `@${ctx.from.username}` : '';
  const firstName = ctx.from.first_name ? ctx.from.first_name : '';
@@ -215,6 +221,10 @@ bot.command('cine', (ctx) => {
 
 // Comando para obtener artículos de series
 bot.command('serie', (ctx) => {
+ if (ctx.from.id !== ALLOWED_USER_ID) {
+  return ctx.reply('Lo siento, no tienes permiso para usar este comando.'); // Mensaje de error
+ }
+
  lastCtx = ctx; // Guarda el contexto
  const username = ctx.from.username ? `@${ctx.from.username}` : '';
  const firstName = ctx.from.first_name ? ctx.from.first_name : '';
@@ -254,7 +264,11 @@ bot.on('text', (ctx) => {
  ctx.reply('Tu texto es: ' + ctx.message.text);
 });
 
+// Manejadores de eventos para diferentes tipos de mensajes
 bot.on('message', (ctx) => {
+ if (ctx.from.id !== ALLOWED_USER_ID) {
+  return ctx.reply('Lo siento, no tienes permiso para enviar mensajes.'); // Mensaje de error
+ }
  ctx.reply('¡Ups! Parece que has enviado un formato de archivo no válido.');
 });
 
