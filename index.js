@@ -16,8 +16,8 @@ const RSS_cine = 'https://www.cinemascomics.com/cine/feed/';
 const RSS_serie = 'https://www.cinemascomics.com/series-de-television/feed/';
 
 // Conjuntos para almacenar los IDs de los artículos enviados
-const sentCineIds = new Set(); 
-const sentSerieIds = new Set(); 
+const sentCineIds = new Set();
+const sentSerieIds = new Set();
 
 // Función para extraer la URL de la primera imagen del contenido
 const extractImage = (content) => {
@@ -44,7 +44,7 @@ const fetchCine = (ctx = null) => {
       const id = item.link[0]; // Usamos el enlace como ID único
       if (!sentCineIds.has(id)) { // Verificamos si ya fue enviado
        sentCineIds.add(id); // Añadimos a los enviados
-       
+
        // Extraemos información del artículo
        const title = item.title[0];
        const link = item.link[0];
@@ -55,8 +55,8 @@ const fetchCine = (ctx = null) => {
 
        // Procesar categorías para crear hashtags
        const categoriesText = item.category ? item.category : [];
-       const catReplace = categoriesText.join(' ').replace(/\s/g, '_'); 
-       const hashtagCat = `#` + catReplace.split('_').join(' #'); 
+       const catReplace = categoriesText.join(' ').replace(/\s/g, '_');
+       const hashtagCat = `#` + catReplace.split('_').join(' #');
 
        const uniqueHashtags = new Set(hashtags);
        hashtagCat.split(' ').forEach(cat => {
@@ -113,7 +113,7 @@ const fetchSerie = (ctx = null) => {
       const id = item.link[0]; // Usamos el enlace como ID único
       if (!sentSerieIds.has(id)) { // Verificamos si ya fue enviado
        sentSerieIds.add(id); // Añadimos a los enviados
-       
+
        // Extraemos información del artículo
        const title = item.title[0];
        const link = item.link[0];
@@ -124,8 +124,8 @@ const fetchSerie = (ctx = null) => {
 
        // Procesar categorías para crear hashtags
        const categoriesText = item.category ? item.category : [];
-       const catReplace = categoriesText.join(' ').replace(/\s/g, '_'); 
-       const hashtagCat = `#` + catReplace.split('_').join(' #'); 
+       const catReplace = categoriesText.join(' ').replace(/\s/g, '_');
+       const hashtagCat = `#` + catReplace.split('_').join(' #');
 
        const uniqueHashtags = new Set(hashtags);
        hashtagCat.split(' ').forEach(cat => {
@@ -222,13 +222,6 @@ bot.on('document', (ctx) => {
 
 bot.on('audio', (ctx) => {
  ctx.reply('¡Ups! Parece que has enviado un formato de archivo no válido.');
-});
-
-bot.on('reply_to_message', (ctx) => {
- if (ctx.message.reply_to_message.photo) {
-  ctx.reply('');
- });
-
 });
 
 bot.on('sticker', (ctx) => {
