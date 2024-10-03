@@ -9,9 +9,20 @@ const { Telegraf } = require('telegraf');
 const request = require('request');
 const xml2js = require('xml2js');
 
-const BOT_TOKEN = '7224464210:AAEaSW07ue0_LGkonUvG3YRezS6zeziGdto';
+const BOT_TOKEN = '7723354766:AAFlbfzZWUnQ7rAed69_yF0g2U-g2bMjAmg';
 
 const bot = new Telegraf(BOT_TOKEN);
+
+bot.start((ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} uso : /start"`);
+
+ ctx.reply('¡Hola! Estoy aquí para traerte artículos de cine y series.\n\nPuedes usar el comando /cine para obtener 3 artículos de cine aleatorias.\n\nPuedes usar el comando /serie para obtener 3 artículos de series aleatorias')
+});
 
 const RSS_cine = 'https://www.cinemascomics.com/cine/feed/';
 const RSS_serie = 'https://www.cinemascomics.com/series-de-television/feed/';
@@ -46,7 +57,7 @@ const fetchCine = (ctx = null) => {
        const description = item.description[0];
        const content = item['content:encoded'][0];
        const imageUrl = extractImage(content); // Obtener la imagen
-       const hashtags = ['#Cine', '#Noticias', '#Películas', '#Estrenos', '#Cultura', '#Entretenimiento'];
+       const hashtags = ['#Cine', '#Noticias', '#Películas', '#Estrenos', '#Cultura', '#Entretenimiento', '#introCinemaClub'];
 
        // Obtener categorías como texto plano
        const categoriesText = item.category ? item.category : [];
@@ -115,7 +126,7 @@ const fetchSerie = (ctx = null) => {
        const description = item.description[0];
        const content = item['content:encoded'][0];
        const imageUrl = extractImage(content); // Obtener la imagen
-       const hashtags = ['#Cine', '#Noticias', '#Películas', '#Estrenos', '#Cultura', '#Entretenimiento'];
+       const hashtags = ['#Cine', '#Noticias', '#Películas', '#Estrenos', '#Cultura', '#Entretenimiento', '#introCinemaClub'];
 
        // Obtener categorías como texto plano
        const categoriesText = item.category ? item.category : [];
@@ -169,13 +180,27 @@ ${finalHashtags}
  });
 };
 
-bot.start((ctx) => ctx.reply('¡Hola! Estoy aquí para traerte artículos de cine y series.\n\nPuedes usar el comando /cine para obtener 3 artículos de cine aleatorias.\n\nPuedes usar el comando /serie para obtener 3 artículos de series aleatorias'));
+// Enviar artículos aleatorios
+bot.command('cine', (ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
+
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} uso : /cine"`);
+
+ fetchCine(ctx)
+});
 
 // Enviar artículos aleatorios
-bot.command('cine', (ctx) => fetchCine(ctx));
+bot.command('serie', (ctx) => {
+ const username = ctx.from.username ? `@${ctx.from.username}` : '';
+ const firstName = ctx.from.first_name ? ctx.from.first_name : '';
+ const userId = ctx.from.id;
 
-// Enviar artículos aleatorios
-bot.command('serie', (ctx) => fetchSerie(ctx));
+ console.log(`"Nombre: ${firstName}, Usuario: ${username}, con el id: ${userId} uso : /serie"`);
+
+ fetchSerie(ctx)
+});
 
 // Mantiene el bot vivo y envía solo el último artículo
 setInterval(() => fetchCine(), 60000);
