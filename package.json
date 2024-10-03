@@ -1,11 +1,11 @@
 {
- "name": "@introCinemaClub_bot on telegram",
- "version": "1.2.b",
- "description": "Telegram bot to search movies from TheMovieDB API",
+ "name": "telegram-news-bot",
+ "version": "1.0.0",
+ "description": "Bot de Telegram que envía noticias desde un feed RSS.",
  "main": "index.js",
  "dependencies": {
   "express": "^4.17.1",
-  "telegraf": "^4.4.0",
+  "telegraf": "^4.0.0",
   "request": "^2.88.2",
   "node-nlp": "^4.10.1",
   "xml2js": "^0.4.23"
@@ -13,6 +13,6 @@
  "scripts": {
   "start": "node index.js"
  },
- "author": "Renny Villafranco on Telegram @TackOnes1",
+ "author": "Ericka Benucci",
  "license": "MIT"
 }
