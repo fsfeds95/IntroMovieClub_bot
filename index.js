@@ -9,7 +9,7 @@ const Bottleneck = require('bottleneck'); // Para limitar conexiones
 const app = express();
 const port = 8225; // Puerto donde se ejecutará el servidor
 
-const BOT_TOKEN = '7224464210:AAFk-AEAFUu-BG-0rBefuNI-eLZCEcM2DHk'; // Token del bot de Telegram
+const BOT_TOKEN = '7224464210:AAFZZaddmgTLHRNq3pupUhDuC-Uxi9dZCz0'; // Token del bot de Telegram
 const bot = new Telegraf(BOT_TOKEN); // Inicializa el bot
 
 let lastCtx = null; // Variable para guardar el último contexto
