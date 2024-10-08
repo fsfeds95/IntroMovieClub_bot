@@ -132,8 +132,8 @@ const fetchSpoiler = (ctx = null) => {
 
       randomArticles.forEach(item => {
        const id = item.link[0]; // Usamos el enlace como ID único
-       if (!sentIds.has(id)) { // Verificamos si ya fue enviado
-        sentIds.add(id); // Añadimos a los enviados
+       if (!sentSpoilerIds.has(id)) { // Verificamos si ya fue enviado
+        sentSpoilerIds.add(id); // Añadimos a los enviados
 
         // Extraemos información del artículo
         const title = item.title[0];
