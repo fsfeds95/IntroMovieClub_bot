@@ -162,7 +162,7 @@ const fetchSpoiler = (ctx = null) => {
 ▬▬▬▬▬▬▬▬▬
 ⟨🍿⟩ ${title}
 ▬▬▬▬▬▬▬▬▬
-⟨💭⟩ Resumen: ${description.substring(0, 1500)}...
+⟨💭⟩ Resumen: ${description.substring(0, 800)}...
 ▬▬▬▬▬▬▬▬▬
 ${finalHashtags}
 ▬▬▬▬▬▬▬▬▬
