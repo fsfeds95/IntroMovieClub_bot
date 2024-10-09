@@ -87,7 +87,7 @@ const fetchCinemascomics = (ctx = null) => {
 ▬▬▬▬▬▬▬▬▬
 ⟨🍿⟩ ${title}
 ▬▬▬▬▬▬▬▬▬
-⟨💭⟩ Resumen: ${description.substring(0, 70)}..
+⟨💭⟩ Resumen: ${description.substring(0, 140)}...
 ▬▬▬▬▬▬▬▬▬
 ${finalHashtags}
 ▬▬▬▬▬▬▬▬▬
@@ -162,7 +162,7 @@ const fetchSpoiler = (ctx = null) => {
 ▬▬▬▬▬▬▬▬▬
 ⟨🍿⟩ ${title}
 ▬▬▬▬▬▬▬▬▬
-⟨💭⟩ Resumen: ${description.substring(0, 70)}...
+⟨💭⟩ Resumen: ${description.substring(0, 140)}...
 ▬▬▬▬▬▬▬▬▬
 ${finalHashtags}
 ▬▬▬▬▬▬▬▬▬
@@ -203,7 +203,7 @@ const fetchCine = (ctx = null) => {
     xml2js.parseString(body, (err, result) => {
      if (!err) {
       const items = result.rss.channel[0].item; // Obtiene los artículos del feed
-      const randomArticles = items.sort(() => 0.5 - Math.random()).slice(0, 3); // Artículos aleatorios
+      const randomArticles = items.sort(() => 0.3 - Math.random()).slice(0, 3); // Artículos aleatorios
 
       randomArticles.forEach(item => {
        const id = item.link[0]; // Usamos el enlace como ID único
@@ -237,7 +237,7 @@ const fetchCine = (ctx = null) => {
 ▬▬▬▬▬▬▬▬▬
 ⟨🍿⟩ ${title}
 ▬▬▬▬▬▬▬▬▬
-⟨💭⟩ Resumen: ${description.substring(0, 70)}...
+⟨💭⟩ Resumen: ${description.substring(0, 140)}...
 ▬▬▬▬▬▬▬▬▬
 ${finalHashtags}
 ▬▬▬▬▬▬▬▬▬
@@ -278,7 +278,7 @@ const fetchSerie = (ctx = null) => {
     xml2js.parseString(body, (err, result) => {
      if (!err) {
       const items = result.rss.channel[0].item; // Obtiene los artículos del feed
-      const randomArticles = items.sort(() => 0.5 - Math.random()).slice(0, 3); // Artículos aleatorios
+      const randomArticles = items.sort(() => 0.3 - Math.random()).slice(0, 3); // Artículos aleatorios
 
       randomArticles.forEach(item => {
        const id = item.link[0]; // Usamos el enlace como ID único
@@ -312,7 +312,7 @@ const fetchSerie = (ctx = null) => {
 ▬▬▬▬▬▬▬▬▬
 ⟨🍿⟩ ${title}
 ▬▬▬▬▬▬▬▬▬
-⟨💭⟩ Resumen: ${description.substring(0, 70)}...
+⟨💭⟩ Resumen: ${description.substring(0, 140)}...
 ▬▬▬▬▬▬▬▬▬
 ${finalHashtags}
 ▬▬▬▬▬▬▬▬▬
