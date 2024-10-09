@@ -87,7 +87,7 @@ const fetchCinemascomics = (ctx = null) => {
 ▬▬▬▬▬▬▬▬▬
 ⟨🍿⟩ ${title}
 ▬▬▬▬▬▬▬▬▬
-⟨💭⟩ Resumen: ${description.substring(0, 800)}...
+⟨💭⟩ Resumen: ${description.substring(0, 500)}...
 ▬▬▬▬▬▬▬▬▬
 ${finalHashtags}
 ▬▬▬▬▬▬▬▬▬
@@ -162,7 +162,7 @@ const fetchSpoiler = (ctx = null) => {
 ▬▬▬▬▬▬▬▬▬
 ⟨🍿⟩ ${title}
 ▬▬▬▬▬▬▬▬▬
-⟨💭⟩ Resumen: ${description.substring(0, 800)}...
+⟨💭⟩ Resumen: ${description.substring(0, 500)}...
 ▬▬▬▬▬▬▬▬▬
 ${finalHashtags}
 ▬▬▬▬▬▬▬▬▬
@@ -237,7 +237,7 @@ const fetchCine = (ctx = null) => {
 ▬▬▬▬▬▬▬▬▬
 ⟨🍿⟩ ${title}
 ▬▬▬▬▬▬▬▬▬
-⟨💭⟩ Resumen: ${description.substring(0, 800)}...
+⟨💭⟩ Resumen: ${description.substring(0, 500)}...
 ▬▬▬▬▬▬▬▬▬
 ${finalHashtags}
 ▬▬▬▬▬▬▬▬▬
@@ -312,7 +312,7 @@ const fetchSerie = (ctx = null) => {
 ▬▬▬▬▬▬▬▬▬
 ⟨🍿⟩ ${title}
 ▬▬▬▬▬▬▬▬▬
-⟨💭⟩ Resumen: ${description.substring(0, 800)}...
+⟨💭⟩ Resumen: ${description.substring(0, 500)}...
 ▬▬▬▬▬▬▬▬▬
 ${finalHashtags}
 ▬▬▬▬▬▬▬▬▬
