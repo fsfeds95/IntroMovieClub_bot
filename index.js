@@ -35,7 +35,7 @@ const sentSerieIds = new Set();
 
 // Configuración del limitador
 const limiter = new Bottleneck({
- minTime: 15000, // Espera 15 segundo entre cada solicitud
+ minTime: 7500, // Espera 7.5 segundo entre cada solicitud
 });
 
 // Función para verificar si la URL de la imagen es válida
@@ -87,7 +87,7 @@ const fetchCinemascomics = (ctx = null) => {
 ▬▬▬▬▬▬▬▬▬
 ⟨🍿⟩ ${title}
 ▬▬▬▬▬▬▬▬▬
-⟨💭⟩ Resumen: ${description.substring(0, 140)}...
+⟨💭⟩ Resumen: ${description.substring(0, 800)}...
 ▬▬▬▬▬▬▬▬▬
 ${finalHashtags}
 ▬▬▬▬▬▬▬▬▬
@@ -162,7 +162,7 @@ const fetchSpoiler = (ctx = null) => {
 ▬▬▬▬▬▬▬▬▬
 ⟨🍿⟩ ${title}
 ▬▬▬▬▬▬▬▬▬
-⟨💭⟩ Resumen: ${description.substring(0, 140)}...
+⟨💭⟩ Resumen: ${description.substring(0, 800)}...
 ▬▬▬▬▬▬▬▬▬
 ${finalHashtags}
 ▬▬▬▬▬▬▬▬▬
@@ -237,7 +237,7 @@ const fetchCine = (ctx = null) => {
 ▬▬▬▬▬▬▬▬▬
 ⟨🍿⟩ ${title}
 ▬▬▬▬▬▬▬▬▬
-⟨💭⟩ Resumen: ${description.substring(0, 140)}...
+⟨💭⟩ Resumen: ${description.substring(0, 800)}...
 ▬▬▬▬▬▬▬▬▬
 ${finalHashtags}
 ▬▬▬▬▬▬▬▬▬
@@ -312,7 +312,7 @@ const fetchSerie = (ctx = null) => {
 ▬▬▬▬▬▬▬▬▬
 ⟨🍿⟩ ${title}
 ▬▬▬▬▬▬▬▬▬
-⟨💭⟩ Resumen: ${description.substring(0, 140)}...
+⟨💭⟩ Resumen: ${description.substring(0, 800)}...
 ▬▬▬▬▬▬▬▬▬
 ${finalHashtags}
 ▬▬▬▬▬▬▬▬▬
